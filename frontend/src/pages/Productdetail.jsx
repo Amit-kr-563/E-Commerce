@@ -366,16 +366,6 @@ export default function Productcarddetails() {
     fetchReviews();
   }, [fetchProduct, fetchReviews]);
 
-  // ---------------- IMAGE HANDLING ----------------
-  const getAllImages = () => {
-    if (!product) return [];
-    const images = [product.img];
-    if (product.images && product.images.length > 0) {
-      images.push(...product.images);
-    }
-    return images;
-  };
-
   // ---------------- CLOTHING CHECK ----------------
   const isClothingProduct = (p) => {
     if (!p) return false;

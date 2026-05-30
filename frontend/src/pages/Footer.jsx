@@ -1,6 +1,10 @@
 import "./Footer.css";
 
 export default function Footer() {
+  const handlePlaceholderClick = (event) => {
+    event.preventDefault();
+  };
+
   return (
     <>
       <footer className="footer">
@@ -10,8 +14,8 @@ export default function Footer() {
              <div className="social-icons">
               <a href="https://x.com/Amit34394836"><i className="fab fa-twitter"></i></a>
               <a href="https://www.instagram.com/amit_kr_563/"><i className="fab fa-instagram"></i></a>
-             <a href="https://www.linkedin.com/in/amit-kumar-ab24602a4/"><i class="fa-brands fa-linkedin"></i></a>
-             <a href="https://github.com/Amit-kr-563"><i class="fa-brands fa-github"></i></a>
+             <a href="https://www.linkedin.com/in/amit-kumar-ab24602a4/"><i className="fa-brands fa-linkedin"></i></a>
+             <a href="https://github.com/Amit-kr-563"><i className="fa-brands fa-github"></i></a>
             
             </div>
           </div>
@@ -32,9 +36,9 @@ export default function Footer() {
             <ul>
               <li><a href="/aboutus">About Us</a></li>
                <li><a href="/contect">Let's Connect</a></li>
-              <li><a href="#">Privacy Policy</a></li>
+              <li><button type="button" onClick={handlePlaceholderClick} className="footer-link-button">Privacy Policy</button></li>
              
-              <li><a href="#">Terms &  Conditions</a></li>
+              <li><button type="button" onClick={handlePlaceholderClick} className="footer-link-button">Terms & Conditions</button></li>
             </ul>
         
           </div>

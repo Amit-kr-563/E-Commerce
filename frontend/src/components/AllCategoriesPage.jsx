@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { getSubcategories } from '../data/categories';
 import Navbar from '../pages/Navbar';
 import Productcard from "../pages/Productcard";
@@ -10,7 +10,6 @@ export default function AllCategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedSubcategory, setSelectedSubcategory] = useState('All');
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -47,11 +46,6 @@ export default function AllCategoriesPage() {
     }
     return product.category === selectedCategory && product.subcategory === selectedSubcategory;
   });
-
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-    setSelectedSubcategory('All');
-  };
 
   if (loading) {
     return (

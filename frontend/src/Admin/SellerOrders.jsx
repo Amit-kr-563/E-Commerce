@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './SellerOrders.css';
 
@@ -12,20 +12,7 @@ function SellerOrders() {
   // Get filter from navigation state or default to 'All'
   const [filter, setFilter] = useState(location.state?.filter || 'All'); // All, Ordered, Dispatched, Delivered
 
-  useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    const token = loggedInUser?.token;
-    const userRole = loggedInUser?.user?.role;
-    
-    if (!token || userRole !== 'seller') {
-      navigate('/login');
-      return;
-    }
-
-    fetchOrders();
-  }, [navigate]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
@@ -41,7 +28,20 @@ function SellerOrders() {
         navigate('/login');
       }
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const token = loggedInUser?.token;
+    const userRole = loggedInUser?.user?.role;
+    
+    if (!token || userRole !== 'seller') {
+      navigate('/login');
+      return;
+    }
+
+    fetchOrders();
+  }, [navigate, fetchOrders]);
 
   const updateOrderStatus = async (orderId, itemIndex, newStatus) => {
     try {

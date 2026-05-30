@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 import './ProductForm.css';
@@ -18,10 +18,6 @@ function EditProduct() {
     specifications: {}
   });
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [additionalImages, setAdditionalImages] = useState([]);
-  const [enableSpecifications, setEnableSpecifications] = useState(false);
-  const [specifications, setSpecifications] = useState([{ key: '', value: '' }]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -38,11 +34,7 @@ function EditProduct() {
     return 0;
   };
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
@@ -62,13 +54,16 @@ function EditProduct() {
         stock: response.data.stock
       });
       setImagePreview(response.data.img);
-      setAdditionalImages(response.data.images || []);
       setLoading(false);
     } catch (err) {
       setError('Failed to load product');
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -102,8 +97,6 @@ function EditProduct() {
         return;
       }
 
-      setImageFile(file);
-      
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);

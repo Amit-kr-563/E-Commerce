@@ -28,7 +28,6 @@ function AddProduct() {
     return 0;
   };
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
   const [additionalImages, setAdditionalImages] = useState([]); // Preview for additional images
   const [enableSpecifications, setEnableSpecifications] = useState(false);
   const [specifications, setSpecifications] = useState([{ key: '', value: '' }]);
@@ -70,8 +69,6 @@ function AddProduct() {
         return;
       }
 
-      setImageFile(file);
-      
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {

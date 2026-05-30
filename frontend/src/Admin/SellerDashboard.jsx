@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './userinfo.css';
 
@@ -11,20 +11,7 @@ function SellerDashboard() {
   const [activeTab, setActiveTab] = useState('products'); // 'products' or 'orders'
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    const token = loggedInUser?.token;
-    const userRole = loggedInUser?.user?.role;
-    
-    if (!token || userRole !== 'seller') {
-      navigate('/login');
-      return;
-    }
-
-    fetchSellerData();
-  }, [navigate]);
-
-  const fetchSellerData = async () => {
+  const fetchSellerData = useCallback(async () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
@@ -32,7 +19,6 @@ function SellerDashboard() {
         headers: { Authorization: `Bearer ${token}` }
       };
 
-      // Fetch products and analytics first
       const [productsRes, analyticsRes] = await Promise.all([
         axios.get('http://localhost:8000/api/seller/products', config),
         axios.get('http://localhost:8000/api/seller/analytics', config)
@@ -41,13 +27,11 @@ function SellerDashboard() {
       setProducts(productsRes.data);
       setAnalytics(analyticsRes.data);
 
-      // Fetch order analytics separately with error handling
       try {
         const orderAnalyticsRes = await axios.get('http://localhost:8000/api/seller/order-analytics', config);
         setOrderAnalytics(orderAnalyticsRes.data);
       } catch (orderError) {
         console.error('Error fetching order analytics:', orderError);
-        // Set default values if order analytics fails
         setOrderAnalytics({
           totalOrders: 0,
           orderedCount: 0,
@@ -66,7 +50,20 @@ function SellerDashboard() {
       }
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const token = loggedInUser?.token;
+    const userRole = loggedInUser?.user?.role;
+    
+    if (!token || userRole !== 'seller') {
+      navigate('/login');
+      return;
+    }
+
+    fetchSellerData();
+  }, [navigate, fetchSellerData]);
 
   const handleDelete = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {

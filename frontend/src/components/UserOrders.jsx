@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './UserOrders.css';
 
@@ -11,20 +11,7 @@ function UserOrders() {
   const [reviewModal, setReviewModal] = useState({ show: false, product: null, orderId: null });
   const [reviewedProducts, setReviewedProducts] = useState(new Set());
 
-  useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    const token = loggedInUser?.token;
-    
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    fetchOrders();
-    checkReviewedProducts();
-  }, [navigate]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
@@ -51,9 +38,9 @@ function UserOrders() {
       }
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
-  const checkReviewedProducts = async () => {
+  const checkReviewedProducts = useCallback(async () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
@@ -74,7 +61,6 @@ function UserOrders() {
             console.log('  Item:', item.name, 'status:', item.status, 'productId:', item.productId);
             if (item.status === 'Delivered' && item.productId) {
               try {
-                // Handle both cases: productId as string or as populated object
                 const productId = typeof item.productId === 'object' && item.productId !== null
                   ? item.productId._id 
                   : item.productId;
@@ -105,7 +91,20 @@ function UserOrders() {
     } catch (error) {
       console.error('Error checking reviewed products:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const token = loggedInUser?.token;
+    
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    fetchOrders();
+    checkReviewedProducts();
+  }, [navigate, fetchOrders, checkReviewedProducts]);
 
   const getFilteredOrders = () => {
     if (filter === 'All') return orders;
@@ -176,7 +175,7 @@ function UserOrders() {
       console.log("Rating:", rating);
       console.log("Review Text:", reviewText);
 
-      const response = await axios.post(
+      await axios.post(
         'http://localhost:8000/api/reviews',
         reviewData,
         { headers: { Authorization: `Bearer ${token}` } }

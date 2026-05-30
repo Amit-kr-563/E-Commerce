@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from 'react';
-import { getAllCategories, getCategoryIcon } from "../data/categories";
 import { getRandomProducts } from "../service/api";
 import "./Featureitem.css";
 import Productcard from "./Productcard";
