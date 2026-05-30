@@ -17,7 +17,10 @@ export default function Productcard({ products = [] }) {
             <div className="watchlist">
 
               <button className="cart-btn1" onClick={() => addToWatchlist(item)}>
-                <img src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png" />
+               <img
+  src="https://cdn-icons-png.flaticon.com/512/1077/1077035.png"
+  alt="Add to watchlist"
+/>
               </button>
             </div>
             <div className="product-image">

@@ -27,11 +27,19 @@ function Navbar() {
   const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   fetchProducts();
+  //   const userData = checkUserLogin();
+  //   fetchCartCount(userData);
+  // }, []);
+
   useEffect(() => {
-    fetchProducts();
-    const userData = checkUserLogin();
-    fetchCartCount(userData);
-  }, []);
+  fetchProducts();
+  const userData = checkUserLogin();
+  fetchCartCount(userData);
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const checkUserLogin = () => {
     const userData = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -64,26 +72,51 @@ function Navbar() {
     }
   };
 
+  // useEffect(() => {
+  //   const handleCartUpdated = () => {
+  //     fetchCartCount();
+  //   };
+
+  //   const handleStorageChange = (event) => {
+  //     if (event.key === "loggedInUser") {
+  //       const userData = checkUserLogin();
+  //       fetchCartCount(userData);
+  //     }
+  //   };
+
+  //   window.addEventListener("cart-updated", handleCartUpdated);
+  //   window.addEventListener("storage", handleStorageChange);
+
+  //   return () => {
+  //     window.removeEventListener("cart-updated", handleCartUpdated);
+  //     window.removeEventListener("storage", handleStorageChange);
+  //   };
+  // }, []);
+
+
   useEffect(() => {
-    const handleCartUpdated = () => {
-      fetchCartCount();
-    };
+  const handleCartUpdated = () => {
+    fetchCartCount();
+  };
 
-    const handleStorageChange = (event) => {
-      if (event.key === "loggedInUser") {
-        const userData = checkUserLogin();
-        fetchCartCount(userData);
-      }
-    };
+  const handleStorageChange = (event) => {
+    if (event.key === "loggedInUser") {
+      const userData = checkUserLogin();
+      fetchCartCount(userData);
+    }
+  };
 
-    window.addEventListener("cart-updated", handleCartUpdated);
-    window.addEventListener("storage", handleStorageChange);
+  window.addEventListener("cart-updated", handleCartUpdated);
+  window.addEventListener("storage", handleStorageChange);
 
-    return () => {
-      window.removeEventListener("cart-updated", handleCartUpdated);
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+  return () => {
+    window.removeEventListener("cart-updated", handleCartUpdated);
+    window.removeEventListener("storage", handleStorageChange);
+  };
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
 
   const getUserName = () => {
     if (loggedInUser?.user) {
@@ -250,7 +283,7 @@ function Navbar() {
     <>
       <nav className="navbar">
         <div className="navbar1">
-          <div className="logo"><img src={logo}></img><h1>SudoCart</h1> </div>
+          <div className="logo"><img src={logo} alt="SudoCart Logo" /><h1>SudoCart</h1> </div>
 <div className="search1"></div>
           <div className="search-container">
             <div className="search-box">
