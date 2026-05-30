@@ -1,0 +1,80 @@
+
+
+.form-container {
+ 
+  background-color: #ffffff;
+  padding: 35px 30px;
+  border-radius: 10px;
+  border: 2px solid black;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 500px;
+  margin-top: 5vh;
+
+}
+
+
+.register-form h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.input-group {
+  margin-bottom: 10px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #4CAF50;
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+button[type="submit"] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.signup {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.signup a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,72 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  text-align: center;
+  padding: 12px;
+  vertical-align: middle;
+}
+
+thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+  transition: background-color 0.3s;
+}
+
+img {
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-sm {
+  font-size: 0.85rem;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border: none;
+  color: black;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border: none;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+}
+.buy-btn-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.proceed-btn {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 25px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.proceed-btn:hover {
+  background-color: orange;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+}

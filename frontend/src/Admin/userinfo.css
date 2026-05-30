@@ -1,0 +1,482 @@
+.user-info-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffe680 0%, #fff 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.user-info-card {
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  max-width: 400px;
+  width: 90%;
+}
+
+.user-info-card h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+  color: #343a40;
+}
+
+.user-info-card p {
+  font-size: 18px;
+  margin: 10px 0;
+  color: #495057;
+}
+
+/* Seller Dashboard Styles */
+.seller-dashboard {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.dashboard-header h1 {
+  font-size: 32px;
+  color: #343a40;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.add-btn, .logout-btn {
+  padding: 10px 20px;
+  border: 2px solid #000;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s;
+  font-weight: 600;
+}
+
+.add-btn {
+  background-color: #ffe680;
+  color: #000;
+}
+
+.add-btn:hover {
+  background-color: #fff;
+  color: #000;
+  border-color: #ffe680;
+}
+
+/* Profile Menu */
+.profile-menu {
+  position: relative;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 15px;
+  background: white;
+  border: 2px solid #ffe680;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+}
+
+.profile-btn:hover {
+  background: #ffe680;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 230, 128, 0.4);
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe680 0%, #fdd835 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-size: 16px;
+}
+
+.profile-name {
+  color: #000;
+  font-size: 14px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  background-color: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.logout-btn:hover {
+  background-color: #ffe680;
+  color: #000;
+}
+
+.analytics-container {
+  margin-bottom: 30px;
+}
+
+.analytics-section {
+  margin-bottom: 30px;
+}
+
+.analytics-section h2 {
+  color: #343a40;
+  font-size: 24px;
+  margin-bottom: 15px;
+  padding-left: 5px;
+}
+
+.analytics-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.analytics-card {
+  background: linear-gradient(135deg, #ffe680 0%, #fff 100%);
+  color: #000;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(255, 230, 128, 0.3);
+  transition: all 0.3s;
+  border: 2px solid #ffe680;
+}
+
+.analytics-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(255, 230, 128, 0.5);
+  background: linear-gradient(135deg, #fff 0%, #ffe680 100%);
+  color: #000;
+}
+
+/* Clickable analytics cards */
+.analytics-card.clickable {
+  cursor: pointer;
+  position: relative;
+}
+
+.analytics-card.clickable::after {
+  content: '→';
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  font-size: 24px;
+  opacity: 0;
+  transition: opacity 0.3s, right 0.3s;
+}
+
+.analytics-card.clickable:hover::after {
+  opacity: 1;
+  right: 20px;
+}
+
+.analytics-card.clickable:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(255, 230, 128, 0.6);
+}
+
+.analytics-card.clickable:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.analytics-card h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  opacity: 0.9;
+}
+
+.analytics-value {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.analytics-detail {
+  font-size: 14px;
+  margin: 5px 0;
+  opacity: 0.9;
+}
+
+/* Order Analytics Cards */
+.order-card {
+  background: linear-gradient(135deg, #ffe680 0%, #fff 100%);
+  border: 2px solid #ffe680;
+}
+
+.ordered-card {
+  background: linear-gradient(135deg, #ffe680 30%, #fff 100%);
+  border: 2px solid #ffe680;
+}
+
+.dispatched-card {
+  background: linear-gradient(135deg, #fff 0%, #ffe680 70%);
+  border: 2px solid #ffe680;
+}
+
+.delivered-card {
+  background: linear-gradient(135deg, #ffe680 0%, #fff 100%);
+  border: 2px solid #ffe680;
+}
+
+.revenue-card {
+  background: linear-gradient(135deg, #fff 0%, #ffe680 100%);
+  border: 2px solid #ffe680;
+}
+
+/* Tabs */
+.tabs-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 10px;
+}
+
+.tab {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #000;
+}
+
+.tab:hover {
+  color: #000;
+  background: #ffe680;
+  border-radius: 5px 5px 0 0;
+}
+
+.tab.active {
+  color: #000;
+  background: #ffe680;
+  border-bottom-color: #ffe680;
+  border-radius: 5px 5px 0 0;
+}
+
+/* Orders Section */
+.orders-section {
+  padding: 40px;
+  text-align: center;
+}
+
+.view-orders-btn {
+  padding: 15px 30px;
+  background: #ffe680;
+  color: #000;
+  border: 3px solid #000;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.view-orders-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(255, 230, 128, 0.5);
+  background: #fff;
+  color: #000;
+  border-color: #ffe680;
+}
+
+.products-section h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #343a40;
+}
+
+.no-products {
+  text-align: center;
+  font-size: 18px;
+  color: #6c757d;
+  padding: 40px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.product-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 15px;
+}
+
+.product-info h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #343a40;
+}
+
+.category {
+  display: inline-block;
+  background-color: #e9ecef;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.price-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.price {
+  font-size: 24px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.original-price {
+  font-size: 16px;
+  color: #6c757d;
+  text-decoration: line-through;
+}
+
+.discount {
+  font-size: 14px;
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.stock {
+  font-size: 14px;
+  color: #495057;
+  margin: 10px 0;
+}
+
+.product-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.edit-btn, .delete-btn {
+  flex: 1;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.edit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.loading {
+  text-align: center;
+  font-size: 20px;
+  padding: 50px;
+  color: #6c757d;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 16px;
+}
