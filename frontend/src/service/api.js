@@ -1,6 +1,8 @@
 import axios from 'axios';
 import Swal from "sweetalert2";
-const URL = "http://localhost:8000";
+import { API_BASE_URL } from '../config';
+
+const URL = API_BASE_URL;
 
 // Helper function to get JWT token from localStorage
 const getAuthToken = () => {
@@ -50,7 +52,7 @@ export const useCart = () => {
       };
       console.log("Sending to server:", payload);
       
-      const response = await axios.post("http://localhost:8000/cart", payload);
+      const response = await axios.post(`${URL}/cart`, payload);
       
       console.log("Server response:", response);
                      
@@ -97,7 +99,7 @@ export const useWatchlist = () => {
       };
       console.log("Sending to server:", payload);
       
-      const response = await axios.post("http://localhost:8000/watchlist", payload);
+      const response = await axios.post(`${URL}/watchlist`, payload);
       
       console.log("Server response:", response);
       
