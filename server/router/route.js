@@ -64,7 +64,7 @@ router.post('/register', async (req, res) => {
 
     // Seller-specific document validations
     if (role === 'seller') {
-      if (!aadhar || !validateAadhar(aadhar)) {
+        if (!aadhaar || !validateAadhar(aadhaar)) {
         return res.status(400).json({ message: 'Invalid Aadhar number. Must be 12 digits.' });
       }
 
