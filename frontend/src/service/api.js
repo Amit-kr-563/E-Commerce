@@ -21,6 +21,28 @@ export const loginUser = (data) => axios.post(`${URL}/login`, data);
 export const getUserInfo = () => 
   axios.get(`${URL}/userinfo`, { headers: getAuthHeaders() });
 
+export const getProductReviews = (productId) => axios.get(`${URL}/api/reviews/product/${productId}`);
+export const submitReview = (data) => {
+  const token = getAuthToken();
+  return axios.post(`${URL}/api/reviews`, data, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+};
+export const checkReview = (productId, orderId) => {
+  const token = getAuthToken();
+  return axios.get(`${URL}/api/reviews/check`, {
+    params: { productId, orderId },
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+};
+
+export const getReviewEligibility = () => {
+  const token = getAuthToken();
+  return axios.get(`${URL}/api/user/review-eligibility`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  });
+};
+
 // Product APIs
 export const getAllProducts = () => axios.get(`${URL}/api/products`);
 export const getProductById = (id) => axios.get(`${URL}/api/products/${id}`);

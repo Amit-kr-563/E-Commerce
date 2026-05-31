@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
+import { submitReview as submitReviewRequest, getReviewEligibility } from '../service/api';
 import './UserOrders.css';
 
 function UserOrders() {
@@ -20,7 +22,7 @@ function UserOrders() {
       console.log("Token:", token ? "Present" : "Missing");
       console.log("User data:", loggedInUser?.user);
       
-      const response = await axios.get('http://localhost:8000/api/user/orders', {
+      const response = await axios.get(`${API_BASE_URL}/api/user/orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -42,54 +44,15 @@ function UserOrders() {
 
   const checkReviewedProducts = useCallback(async () => {
     try {
-      const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-      const token = loggedInUser?.token;
-      
-      console.log('=== CHECKING REVIEWED PRODUCTS ===');
-      
-      const response = await axios.get('http://localhost:8000/api/user/orders', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      console.log('Orders fetched:', response.data.length);
-      
+      const res = await getReviewEligibility();
       const reviewed = new Set();
-      for (const order of response.data) {
-        console.log('Checking order:', order._id, 'status:', order.status);
-        if (order.status === 'Delivered') {
-          for (const item of order.cartItems) {
-            console.log('  Item:', item.name, 'status:', item.status, 'productId:', item.productId);
-            if (item.status === 'Delivered' && item.productId) {
-              try {
-                const productId = typeof item.productId === 'object' && item.productId !== null
-                  ? item.productId._id 
-                  : item.productId;
-                
-                console.log('  Extracted productId:', productId);
-                
-                if (productId) {
-                  const reviewCheck = await axios.get(
-                    `http://localhost:8000/api/reviews/check?productId=${productId}&orderId=${order._id}`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                  );
-                  console.log('  Review check response:', reviewCheck.data);
-                  if (reviewCheck.data.hasReviewed) {
-                    const reviewKey = `${productId}-${order._id}`;
-                    reviewed.add(reviewKey);
-                    console.log('  Added to reviewed set:', reviewKey);
-                  }
-                }
-              } catch (err) {
-                console.error('Error checking review:', err);
-              }
-            }
-          }
-        }
+      for (const r of res.data.reviewed || []) {
+        reviewed.add(r.key);
       }
-      console.log('Final reviewed products set:', Array.from(reviewed));
+      console.log('Eligibility fetched. reviewed:', Array.from(reviewed));
       setReviewedProducts(reviewed);
     } catch (error) {
-      console.error('Error checking reviewed products:', error);
+      console.error('Error checking review eligibility:', error);
     }
   }, []);
 
@@ -149,9 +112,6 @@ function UserOrders() {
 
   const submitReview = async (rating, reviewText) => {
     try {
-      const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-      const token = loggedInUser?.token;
-
       // Handle both cases: productId as string or as populated object
       const productId = typeof reviewModal.product.productId === 'object' && reviewModal.product.productId !== null
         ? reviewModal.product.productId._id 
@@ -175,11 +135,7 @@ function UserOrders() {
       console.log("Rating:", rating);
       console.log("Review Text:", reviewText);
 
-      await axios.post(
-        'http://localhost:8000/api/reviews',
-        reviewData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await submitReviewRequest(reviewData);
 
       alert('Review submitted successfully!');
       setReviewedProducts(prev => new Set([...prev, `${productId}-${reviewModal.orderId}`]));
@@ -347,25 +303,39 @@ function UserOrders() {
                             
                             const reviewKey = `${productId}-${order._id}`;
                             const hasReviewed = reviewedProducts.has(reviewKey);
-                            
+                            const isDeliveredItem = item.status === 'Delivered' || order.status === 'Delivered';
+
                             console.log('Review check:', {
                               productId,
                               orderId: order._id,
                               reviewKey,
                               hasReviewed,
-                              reviewedProductsSet: Array.from(reviewedProducts)
+                              isDeliveredItem,
+                              reviewedProducts: Array.from(reviewedProducts)
                             });
-                            
-                            return !hasReviewed ? (
-                              <button 
-                                className="review-btn"
-                                onClick={() => openReviewModal(item, order._id)}
-                              >
-                                ⭐ Write a Review
-                              </button>
-                            ) : (
-                              <span className="reviewed-badge">✓ Reviewed</span>
-                            );
+
+                            if (isDeliveredItem && !hasReviewed) {
+                              return (
+                                <>
+                                  <button 
+                                    className="review-btn"
+                                    onClick={() => openReviewModal(item, order._id)}
+                                  >
+                                    ⭐ Write a Review
+                                  </button>
+                                </>
+                              );
+                            }
+
+                            if (hasReviewed) {
+                              return (
+                                <>
+                                  <span className="reviewed-badge">✓ Reviewed</span>
+                                </>
+                              );
+                            }
+
+                            return null;
                           })()}
                         </>
                       )}

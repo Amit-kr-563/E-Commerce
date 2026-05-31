@@ -313,9 +313,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import axios from "axios";
+import axios from 'axios';
 import { useCart } from "../components/cartContext";
-import { getProductById } from "../service/api";
+import { getProductById, getProductReviews, checkReview, submitReview } from "../service/api";
+import { API_BASE_URL } from '../config';
 import "./Productdetail.css";
 
 export default function Productcarddetails() {
@@ -328,6 +329,12 @@ export default function Productcarddetails() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [reviewStats, setReviewStats] = useState(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [eligibleOrderId, setEligibleOrderId] = useState(null);
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   // ---------------- FETCH PRODUCT ----------------
   const fetchProduct = useCallback(async () => {
@@ -345,9 +352,7 @@ export default function Productcarddetails() {
   // ---------------- FETCH REVIEWS (AXIOS SAME) ----------------
   const fetchReviews = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/reviews/product/${id}`
-      );
+      const response = await getProductReviews(id);
 
       setReviews(response.data.reviews);
       setReviewStats({
@@ -365,6 +370,46 @@ export default function Productcarddetails() {
     fetchProduct();
     fetchReviews();
   }, [fetchProduct, fetchReviews]);
+
+  // ---------------- CHECK REVIEW ELIGIBILITY ----------------
+  useEffect(() => {
+    const checkEligibility = async () => {
+      try {
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        const token = loggedInUser?.token;
+        if (!token || !product) return;
+
+        const ordersRes = await axios.get(`${API_BASE_URL}/api/user/orders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        for (const order of ordersRes.data) {
+          for (const item of order.cartItems) {
+            const productId = typeof item.productId === 'object' && item.productId !== null
+              ? item.productId._id
+              : item.productId;
+            if (!productId) continue;
+            if (productId.toString() === product._id.toString() && item.status === 'Delivered') {
+              // Check if already reviewed for this order
+              const checkRes = await checkReview(productId, order._id);
+              if (checkRes.data.hasReviewed) {
+                setHasReviewed(true);
+                setEligibleOrderId(null);
+              } else {
+                setEligibleOrderId(order._id);
+                setHasReviewed(false);
+                return;
+              }
+            }
+          }
+        }
+        setEligibleOrderId(null);
+      } catch (err) {
+        console.error('Error checking review eligibility:', err);
+      }
+    };
+    checkEligibility();
+  }, [product]);
 
   // ---------------- CLOTHING CHECK ----------------
   const isClothingProduct = (p) => {
@@ -507,6 +552,13 @@ export default function Productcarddetails() {
             <p><strong>Category:</strong> {product.category}</p>
             <p><strong>Subcategory:</strong> {product.subcategory}</p>
 
+            {/* Write review CTA for eligible users */}
+            {eligibleOrderId && !hasReviewed && (
+              <div style={{ marginTop: 12 }}>
+                <button className="add-to-cart" onClick={() => setShowReviewModal(true)}>⭐ Write a Review</button>
+              </div>
+            )}
+
             {isClothingProduct(product) && (
               <>
                 <label><strong>Size:</strong></label>
@@ -528,16 +580,20 @@ export default function Productcarddetails() {
       </div>
 
       {/* REVIEWS */}
-      {reviewStats && reviewStats.totalReviews > 0 && (
+      {(reviewStats && reviewStats.totalReviews > 0) || (!reviewStats || reviewStats.totalReviews === 0) ? (
         <div className="reviews-section">
 
           <h2>Customer Reviews</h2>
 
           <div>
-            <span>{reviewStats.averageRating.toFixed(1)}</span>
-            <div>{renderStars(reviewStats.averageRating)}</div>
-            <span>{reviewStats.totalReviews} reviews</span>
+            <span>{(reviewStats?.averageRating || 0).toFixed(1)}</span>
+            <div>{renderStars(reviewStats?.averageRating || 0)}</div>
+            <span>{reviewStats?.totalReviews || 0} reviews</span>
           </div>
+
+          {reviews.length === 0 && (
+            <p style={{ color: '#666' }}>No reviews yet. Be the first to review this product!</p>
+          )}
 
           {reviews.map((review) => (
             <div key={review._id}>
@@ -546,6 +602,56 @@ export default function Productcarddetails() {
               <p>{review.review}</p>
             </div>
           ))}
+        </div>
+      ) : null}
+
+      {/* Review Modal (inline) */}
+      {showReviewModal && (
+        <div className="review-modal-overlay" onClick={() => setShowReviewModal(false)}>
+          <div className="review-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="review-modal-header">
+              <h2>Write a Review</h2>
+              <button className="close-btn" onClick={() => setShowReviewModal(false)}>×</button>
+            </div>
+            <div className="review-product-info" style={{ padding: 20 }}>
+              <img src={product.img} alt={product.name} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }} />
+              <h3>{product.name}</h3>
+            </div>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (rating === 0) { alert('Please select a rating'); return; }
+              if (reviewText.trim().length < 10) { alert('Please write at least 10 characters'); return; }
+              try {
+                await submitReview({ productId: product._id, orderId: eligibleOrderId, rating, review: reviewText });
+                alert('Review submitted successfully');
+                setShowReviewModal(false);
+                setReviewText(''); setRating(0);
+                fetchReviews();
+                setHasReviewed(true);
+              } catch (err) {
+                console.error('Submit review error:', err);
+                alert(err.response?.data?.message || 'Failed to submit review');
+              }
+            }}>
+              <div className="rating-section" style={{ padding: 20 }}>
+                <label>Your Rating *</label>
+                <div className="star-rating">
+                  {[1,2,3,4,5].map(star => (
+                    <span key={star} className={`star ${star <= (hoverRating || rating) ? 'filled' : ''}`} onClick={() => setRating(star)} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)}>★</span>
+                  ))}
+                </div>
+              </div>
+              <div className="review-text-section" style={{ padding: 20 }}>
+                <label>Your Review *</label>
+                <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)} placeholder="Share your experience..." rows={5} required></textarea>
+                <small>{reviewText.length} characters (minimum 10)</small>
+              </div>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', padding: 20 }}>
+                <button type="button" className="cancel-btn" onClick={() => setShowReviewModal(false)}>Cancel</button>
+                <button type="submit" className="submit-btn">Submit Review</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </>

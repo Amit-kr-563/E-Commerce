@@ -144,7 +144,7 @@ router.get('/api/reviews/product/:productId', async (req, res) => {
 router.get('/api/reviews/check', authMiddleware, async (req, res) => {
   try {
     const { productId, orderId } = req.query;
-    const userId = req.user.userId;
+    const userId = req.userId;
 
     const review = await Review.findOne({ userId, productId, orderId });
 
@@ -156,6 +156,53 @@ router.get('/api/reviews/check', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error checking review:', error);
     res.status(500).json({ message: 'Failed to check review' });
+  }
+});
+
+// Get review eligibility for logged-in user
+router.get('/api/user/review-eligibility', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+    // Find orders for this user by userId or email/username
+    const User = require('../schema/user-schema');
+    const user = await User.findById(userId).select('email mobile');
+
+    const queryConditions = [{ userId }];
+    if (user?.email) {
+      queryConditions.push({ username: user.email });
+      queryConditions.push({ email: user.email });
+    }
+    if (user?.mobile) {
+      queryConditions.push({ username: user.mobile });
+      queryConditions.push({ mobile: user.mobile });
+    }
+
+    const orders = await Order.find({ $or: queryConditions });
+
+    const eligible = [];
+    const reviewed = [];
+
+    for (const order of orders) {
+      for (const item of order.cartItems) {
+        // Normalize productId
+        const productId = item.productId && item.productId._id ? item.productId._id : item.productId;
+        if (!productId) continue;
+
+        // Consider item delivered if either item.status or order.status marks it delivered
+        const isDelivered = (item.status === 'Delivered') || (order.status === 'Delivered');
+        if (isDelivered) {
+          const existing = await Review.findOne({ userId, productId, orderId: order._id });
+          const key = `${productId}-${order._id}`;
+          if (existing) reviewed.push({ productId: productId.toString(), orderId: order._id.toString(), key });
+          else eligible.push({ productId: productId.toString(), orderId: order._id.toString(), key });
+        }
+      }
+    }
+
+    res.status(200).json({ eligible, reviewed });
+  } catch (error) {
+    console.error('Error fetching review eligibility:', error);
+    res.status(500).json({ message: 'Failed to fetch review eligibility' });
   }
 });
 
