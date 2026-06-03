@@ -573,8 +573,8 @@ export default function Productcarddetails() {
           </div>
 
           <div className="actions">
-            <button onClick={() => addToCart(product)}>Add to Cart</button>
-            <button onClick={handleBuyNow}>Buy Now</button>
+            <button className="add-to-cart" onClick={() => addToCart(product)}>Add to Cart</button>
+            <button className="buy-now" onClick={handleBuyNow}>Buy Now</button>
           </div>
         </div>
       </div>
