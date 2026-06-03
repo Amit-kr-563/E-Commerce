@@ -367,6 +367,59 @@
         gap: 8px;
       }
     }
+
+    @media (max-width: 600px) {
+      .product-detail-container {
+        gap: 18px;
+      }
+
+      .main-image {
+        max-height: 320px;
+      }
+
+      .price {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .old-price,
+      .discount {
+        margin-left: 0;
+      }
+
+      .details select {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .add-to-cart,
+      .buy-now {
+        width: 100%;
+        margin-right: 0;
+      }
+
+      .specifications-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .reviews-section {
+        margin: 16px;
+        padding: 16px;
+      }
+
+      .review-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
 /* Reviews Section */
 .reviews-section {
   max-width: 1200px;

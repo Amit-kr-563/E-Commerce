@@ -168,8 +168,8 @@ const CartPage = ({username}) => {
         ) : (
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 2 }}>
             <Paper elevation={0} sx={{ borderRadius: 3, border: "1px solid #eee", overflow: "hidden" }}>
-              <TableContainer>
-                <Table>
+              <TableContainer sx={{ overflowX: "auto" }}>
+                <Table sx={{ minWidth: { xs: 620, md: "auto" } }}>
                   <TableHead sx={{ background: "#fff8d9" }}>
                     <TableRow>
                       <TableCell>Product</TableCell>
