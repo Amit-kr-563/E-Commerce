@@ -584,19 +584,13 @@ const ProceedToPayPage = () => {
         setLoading(true);
         console.log("Initiating payment request for amount:", totalAmount);
 
-        // API Endpoint exact as per your server.js configuration
-        // const orderRes = await axios.post("http://localhost:8000/api/payment/create-order", {
-        //   amount: totalAmount
-        // });
-        // Purani Line (Line 588 ke paas):
-// const orderRes = await axios.post("https://e-commerce-pkcj.onrender.com/api/payment/create-order", ...
-
-// Nayi Line (Isko replace karein):
-// const orderRes = await axios.post("http://localhost:8000/api/payment/create-order", {
+       
+      
+// const orderRes = await axios.create().post("http://localhost:8000/api/payment/create-order", {
 //   amount: totalAmount
 // });
-// Order create karne wali API call ko aise likhiye (Bina basic axios ke, direct naya instance banakar):
-const orderRes = await axios.create().post("http://localhost:8000/api/payment/create-order", {
+
+const orderRes = await axios.create().post("https://e-commerce-pkcj.onrender.com/api/payment/create-order", {
   amount: totalAmount
 });
 
@@ -631,7 +625,13 @@ const orderRes = await axios.create().post("http://localhost:8000/api/payment/cr
               console.log("Razorpay Success Token Received. Verification triggering...", response);
               
               // Signature Verification
-              const verifyRes = await axios.create().post("http://localhost:8000/api/payment/verify", {
+//               const verifyRes = await axios.create().post("http://localhost:8000/api/payment/verify", {
+//   razorpay_payment_id: response.razorpay_payment_id,
+//   razorpay_order_id: response.razorpay_order_id,
+//   razorpay_signature: response.razorpay_signature,
+// });
+
+const verifyRes = await axios.create().post("https://e-commerce-pkcj.onrender.com/api/payment/verify", {
   razorpay_payment_id: response.razorpay_payment_id,
   razorpay_order_id: response.razorpay_order_id,
   razorpay_signature: response.razorpay_signature,
