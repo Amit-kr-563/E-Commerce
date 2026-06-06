@@ -18,7 +18,7 @@ import ProceedToPayPage from "./components/checkout";
 import Homepage from "./components/Homepage";
 import Kidspage from "./components/Kidspage";
 import Menpage from "./components/Menpage";
-import Paymentpage from './components/Paymentpage';
+// import Paymentpage from './components/Paymentpage';
 import Shop from "./components/Shop";
 import UserOrders from './components/UserOrders';
 import WatchlistPage from "./components/Watchlistpage";
@@ -56,7 +56,7 @@ function App(props) {
         <Route path="/checkout" element={<ProceedToPayPage/>}/>
         <Route path="/admin" exact  element={<AdminLogin/>}/>
         <Route path="admin/orders" element={<AdminOrdersPage/>}></Route>
-        <Route path="/payment" element={<Paymentpage />} />
+        {/* <Route path="/payment" element={<Paymentpage />} /> */}
         <Route path="/contect" element={<ContectSection/>}></Route>
         
         {/* Seller Routes */}

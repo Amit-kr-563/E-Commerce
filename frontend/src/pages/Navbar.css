@@ -1,73 +1,79 @@
-
-
+/* ==========================================================================
+   1. Base & Layout Styles
+   ========================================================================== */
 body {
   background-color: #fff;
-}
-.navbar{
-     position: sticky;
-  top: 0;
-  z-index: 1000;
-   align-items: center;
-   padding:0px;
-
-  
-}
-.logo {
-  display: flex;
-  
- 
+  margin: 0;
+  padding: 0;
 }
 
-.logo img {
-  height: 70px;   /* Adjust height as needed */
-  width: auto;    /* Maintain aspect ratio */
-  object-fit: contain;
+.navbar {
+  position: relative; /* 'sticky' se badal kar 'relative' kar diya */
+  width: 100%;
+  margin: 0;   /* Navbar ke upar-niche ka space khatam kiya */
+  padding: 0;
 }
-.logo h1{
-  font-weight: 600;
-  padding-top: 15px;
-  color: black;
-
-}
-
 
 .navbar1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30px 0 50px;
+  padding: 0 50px;
   background-color: #ffe680;
-     width: 100%;
-  /*border-bottom: 2px solid #f0f0f0;*/
+  width: 100%;
+  box-sizing: border-box;
 }
 
-
-
-.search-box {
+/* ==========================================================================
+   2. Logo Styling
+   ========================================================================== */
+.logo {
   display: flex;
   align-items: center;
-  border: 2px solid #ffe680;
-  border-radius: 10px;
-  overflow: hidden;
-  flex: 1;
-  margin: 0 30px;
-  max-width: 600px;
+  gap: 8px;
+  cursor: pointer;
 }
 
+.logo img {
+  height: 60px; /* Thoda optimized height desktop ke liye */
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.logo h1 {
+  font-weight: 700;
+  margin: 0;   /* h1 ki default top-bottom margin ko zero kiya jo space bana rahi thi */
+  padding: 0;
+  margin: 0;
+  color: black;
+  font-size: 24px;
+  line-height: 60px;
+}
+
+/* ==========================================================================
+   3. Search Container & Suggestions
+   ========================================================================== */
 .search-container {
   position: relative;
   flex: 1;
   max-width: 600px;
+  margin: 0 30px;
 }
 
-.search-container .search-box {
-  margin: 0;
-  max-width: 100%;
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 2px solid #000; /* Contrast ke liye borders ko solid black kiya */
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  width: 100%;
 }
 
 .search-box input {
   flex: 1;
-  padding: 10px;
+  padding: 10px 12px;
   border: none;
   outline: none;
   font-size: 14px;
@@ -76,8 +82,15 @@ body {
 .search-box button {
   background-color: #ffe680;
   border: none;
-  padding: 10px 15px;
+  border-left: 2px solid #000;
+  padding: 10px 18px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.search-box button:hover {
+  background-color: #ffd62e;
 }
 
 .search-suggestions {
@@ -88,9 +101,9 @@ body {
   max-height: 320px;
   overflow-y: auto;
   background: #fff;
-  border: 2px solid #ffe680;
+  border: 2px solid #000;
   border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   z-index: 1200;
 }
 
@@ -100,7 +113,7 @@ body {
   border-bottom: 1px solid #f2f2f2;
   background: #fff;
   text-align: left;
-  padding: 10px 12px;
+  padding: 12px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -126,7 +139,97 @@ body {
   color: #666;
 }
 
-/* Category Carousel Container */
+/* ==========================================================================
+   4. Action Icons & Badges
+   ========================================================================== */
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart-icon-link {
+  text-decoration: none;
+  color: #000;
+}
+
+.cart-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-count-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 50%;
+  background: #e53935;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fff;
+}
+
+.icons i {
+  font-size: 18px;
+  padding: 8px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.icons i:hover {
+  background-color: #ffe680;
+}
+
+/* User Display Badge */
+.user-display-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background-color: #fff;
+  border-radius: 20px;
+  border: 2px solid #000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-display-badge:hover {
+  background-color: #ffe680;
+}
+
+.user-display-badge i {
+  font-size: 18px;
+  color: black;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.user-display-badge i:hover {
+  background: transparent;
+}
+
+.user-display-badge span {
+  font-weight: 600;
+  color: black;
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   5. Category Carousel
+   ========================================================================== */
 .category-carousel-container {
   width: 100%;
   display: flex;
@@ -144,27 +247,27 @@ body {
   scroll-behavior: smooth;
   padding: 5px 50px;
   flex: 1;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .category-carousel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .category-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
+  padding: 8px 18px;
   background: #fff;
   border: 2px solid #ffe680;
   border-radius: 25px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.3s;
+  transition: all 0.2s;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   color: #000;
   min-width: fit-content;
 }
@@ -172,16 +275,10 @@ body {
 .category-item:hover {
   background: #ffe680;
   border-color: #000;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .category-icon {
-  font-size: 18px;
-}
-
-.category-name {
-  font-weight: 600;
+  font-size: 16px;
 }
 
 .carousel-btn {
@@ -189,237 +286,106 @@ body {
   background: #ffe680;
   border: 2px solid #000;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 10;
-  transition: all 0.3s;
+  transition: all 0.2s;
   color: #000;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .carousel-btn:hover {
   background: #fff;
-  transform: scale(1.1);
 }
 
-.prev-btn {
-  left: 5px;
-}
+.prev-btn { left: 10px; }
+.next-btn { right: 10px; }
 
-.next-btn {
-  right: 5px;
-}
 
-.icons {
-  display: flex;
-  gap: 15px;
-}
+/* ==========================================================================
+   6. Media Queries (Responsive Tuning)
+   ========================================================================== */
 
-.cart-icon-link {
-  text-decoration: none;
-}
-
-.cart-icon-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cart-count-badge {
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: #e53935;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 18px;
-  text-align: center;
-  border: 1px solid #fff;
-}
-
-.icons i {
-  font-size: 18px;
-  padding: 8px;
-  border: 2px solid #ffe680;
-  border-radius: 8px;
-  cursor: pointer;
-}
-i:hover{
-  background-color: #ffe680;
-}
-
-/* User Display Badge */
-.user-display-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background-color: #ffe680;
-  border-radius: 20px;
-  border: 2px solid #000;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.user-display-badge:hover {
-  background-color: #ffd62e;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.user-display-badge i {
-  font-size: 20px;
-  color: black;
-  padding: 0;
-  border: none;
-}
-
-.user-display-badge span {
-  font-weight: 600;
-  color: black;
-  font-size: 14px;
-}
-
+/* Tablets & Small Laptops */
 @media (max-width: 992px) {
   .navbar1 {
+    padding: 10px 24px;
+  }
+  .search-container {
+    margin: 0 15px;
+  }
+  .logo img {
+    height: 50px;
+  }
+  .logo h1 {
+    font-size: 20px;
+  }
+}
+
+/* Mobile Screens (Landscape/Portrait Shift) */
+@media (max-width: 768px) {
+  .navbar1 {
     flex-wrap: wrap;
-    gap: 12px;
     padding: 12px 16px;
-    align-items: center;
   }
 
   .logo {
-    flex: 0 0 auto;
-  }
-
-  .search-container {
-    order: 3;
-    flex: 1 1 100%;
-    max-width: none;
-    width: 100%;
-  }
-
-  .search-box {
-    margin: 0;
-    max-width: none;
-    width: 100%;
+    order: 1;
   }
 
   .icons {
-    flex: 1 1 auto;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 10px;
+    order: 2;
   }
 
-  .user-display-badge span {
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  /* Search bar auto-adjusts to full width on next row */
+  .search-container {
+    order: 3;
+    flex: 1 1 100%;
+    margin: 12px 0 4px 0;
+    max-width: 100%;
   }
 
   .category-carousel {
     padding: 5px 40px;
   }
-
-  .category-item {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
 }
 
-@media (max-width: 600px) {
-  .navbar1 {
-    padding: 10px 12px;
-  }
-
+/* Extra Small Devices (Smartphones) */
+@media (max-width: 480px) {
   .logo img {
-    height: 52px;
-  }
-
-  .logo h1 {
-    font-size: 22px;
-    padding-top: 8px;
-  }
-
-  .icons {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .user-display-badge {
-    padding: 6px 10px;
-    gap: 6px;
-  }
-
-  .user-display-badge span {
-    max-width: 90px;
-    font-size: 12px;
-  }
-
-  .search-box input {
-    font-size: 13px;
-    padding: 10px 8px;
-  }
-
-  .search-box button {
-    padding: 10px 12px;
-  }
-
-  .search-suggestions {
-    max-height: 240px;
-  }
-
-  .category-carousel-container {
-    padding: 8px 0;
-  }
-
-  .category-carousel {
-    padding: 5px 34px;
-    gap: 10px;
-  }
-
-  .category-item {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .carousel-btn {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-@media (max-width: 420px) {
-  .logo img {
-    height: 46px;
+    height: 42px;
   }
 
   .logo h1 {
     font-size: 18px;
   }
 
-  .icons {
-    gap: 8px;
-  }
-
   .user-display-badge span {
-    display: none;
+    display: none; /* Mobile par username text hide karke layout cleanly save karega */
   }
 
-  .cart-count-badge {
-    top: -6px;
-    right: -8px;
+  .user-display-badge {
+    padding: 8px;
+    border-radius: 50%;
+  }
+
+  .category-carousel {
+    padding: 5px 35px;
+    gap: 10px;
+  }
+
+  .category-item {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .carousel-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
   }
 }

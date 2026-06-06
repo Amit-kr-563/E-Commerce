@@ -72,27 +72,6 @@ function Navbar() {
     }
   };
 
-  // useEffect(() => {
-  //   const handleCartUpdated = () => {
-  //     fetchCartCount();
-  //   };
-
-  //   const handleStorageChange = (event) => {
-  //     if (event.key === "loggedInUser") {
-  //       const userData = checkUserLogin();
-  //       fetchCartCount(userData);
-  //     }
-  //   };
-
-  //   window.addEventListener("cart-updated", handleCartUpdated);
-  //   window.addEventListener("storage", handleStorageChange);
-
-  //   return () => {
-  //     window.removeEventListener("cart-updated", handleCartUpdated);
-  //     window.removeEventListener("storage", handleStorageChange);
-  //   };
-  // }, []);
-
 
   useEffect(() => {
   const handleCartUpdated = () => {

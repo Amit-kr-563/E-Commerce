@@ -127,6 +127,51 @@ router.delete("/cart/:id", async (req, res) => {
     res.status(500).json("Delete failed");
   }
 });
+// router.put("/cart/:id", async (req, res) => {
+
+//   try {
+//     const cartItem = await Cart.findById(req.params.id);
+//     if (!cartItem) {
+//       return res.status(404).json({ error: "Cart item not found" });
+//     }
+    
+//     const newQuantity = req.body.quantity;
+    
+//     // If originalPrice doesn't exist (old cart items), set it to current price
+//     if (!cartItem.originalPrice) {
+//       cartItem.originalPrice = cartItem.price;
+//       await cartItem.save();
+//     }
+    
+//     // Calculate bulk discount based on new quantity
+//     const bulkDiscount = calculateBulkDiscount(newQuantity);
+    
+//     // Calculate discounted price using originalPrice
+//     const discountedPrice = calculateDiscountedPrice(cartItem.originalPrice, bulkDiscount);
+    
+//     // Update cart item with new quantity, discount, and price
+//     const updatedItem = await Cart.findByIdAndUpdate(
+//       req.params.id,
+//       { 
+//         $set: { 
+//           quantity: newQuantity,
+//           bulkDiscount: bulkDiscount,
+//           price: discountedPrice,
+//           originalPrice: cartItem.originalPrice
+//         } 
+//       },
+//       { new: true }
+//     );
+    
+//     res.status(200).json(updatedItem);
+//   } catch (err) {
+//     console.error("Update error:", err);
+//     res.status(500).json("Update failed");
+//   }
+// });
+
+
+
 router.put("/cart/:id", async (req, res) => {
   try {
     const cartItem = await Cart.findById(req.params.id);
@@ -134,12 +179,15 @@ router.put("/cart/:id", async (req, res) => {
       return res.status(404).json({ error: "Cart item not found" });
     }
     
-    const newQuantity = req.body.quantity;
+    // String to strict integer conversion
+    const newQuantity = parseInt(req.body.quantity, 10);
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      return res.status(400).json({ error: "Invalid quantity provided" });
+    }
     
     // If originalPrice doesn't exist (old cart items), set it to current price
     if (!cartItem.originalPrice) {
       cartItem.originalPrice = cartItem.price;
-      await cartItem.save();
     }
     
     // Calculate bulk discount based on new quantity
@@ -148,27 +196,20 @@ router.put("/cart/:id", async (req, res) => {
     // Calculate discounted price using originalPrice
     const discountedPrice = calculateDiscountedPrice(cartItem.originalPrice, bulkDiscount);
     
-    // Update cart item with new quantity, discount, and price
-    const updatedItem = await Cart.findByIdAndUpdate(
-      req.params.id,
-      { 
-        $set: { 
-          quantity: newQuantity,
-          bulkDiscount: bulkDiscount,
-          price: discountedPrice,
-          originalPrice: cartItem.originalPrice
-        } 
-      },
-      { new: true }
-    );
+    // Direct instance modification to trigger schema hooks safely
+    cartItem.quantity = newQuantity;
+    cartItem.bulkDiscount = bulkDiscount;
+    cartItem.price = discountedPrice;
     
+    const updatedItem = await cartItem.save();
+    
+    console.log(`[DB Success] Item ${req.params.id} updated to Qty: ${newQuantity}`);
     res.status(200).json(updatedItem);
   } catch (err) {
-    console.error("Update error:", err);
+    console.error("Update error in database:", err);
     res.status(500).json("Update failed");
   }
 });
-
 // Migration route to fix existing cart items (run once)
 router.post("/cart/migrate/fix-prices", async (req, res) => {
   try {

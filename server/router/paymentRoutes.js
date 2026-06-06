@@ -14,22 +14,35 @@ const razorpay = new Razorpay({
  */
 router.post("/create-order", async (req, res) => {
   try {
-    const { amount } = req.body;
+      const amountInput = req.body.amount;
+const amount = Math.round(parseFloat(amountInput));
+
+if (isNaN(amount) || amount <= 0) {
+  return res.status(400).json({ success: false, message: "Valid Amount required" });
+}
+    
+    // YAHAN CHECK KARIYE KEY_ID PRINT HO RAHI HAI YA UNDEFINED?
+    console.log("=== RAZORPAY KEY CHECK ===", process.env.RAZORPAY_KEY_ID); 
 
     if (!amount) {
       return res.status(400).json({ success: false, message: "Amount required" });
     }
+
+    // Baaki ka code wahi same...
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       console.error('Razorpay keys are not configured in environment variables');
       return res.status(500).json({ success: false, message: 'Payment gateway not configured' });
     }
 
-    const options = {
-      amount: amount * 100, // paisa
-      currency: "INR",
-      receipt: `receipt_${Date.now()}`,
-    };
+    
+  
+
+const options = {
+  amount: amount * 100, // Ab yeh perfectly standard integer ban chuka hai
+  currency: "INR",
+  receipt: `receipt_${Date.now()}`,
+};
 
     const order = await razorpay.orders.create(options);
 
