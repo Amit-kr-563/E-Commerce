@@ -1,80 +1,206 @@
+/* Base Layout */
+.reg-page-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow-x: hidden;
+  background-color: #faf9f5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* Pure hardware acceleration force karne ke liye */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
 
-
-.form-container {
- 
-  background-color: #ffffff;
-  padding: 35px 30px;
-  border-radius: 10px;
-  border: 2px solid black;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+/* Background Blobs (Sirf Desktop par dikhenge) */
+.reg-bg-blob {
+  position: absolute;
   width: 500px;
-  margin-top: 5vh;
-
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  z-index: 0;
+  pointer-events: none;
 }
 
-
-.register-form h2 {
-  text-align: center;
-  margin-bottom: 15px;
-  color: #333;
+.blob-1 {
+  top: -150px;
+  left: -100px;
+  background: #ffe680;
 }
 
-.input-group {
-  margin-bottom: 10px;
+.blob-2 {
+  bottom: -150px;
+  right: -100px;
+  background: #fff3b3;
 }
 
-.input-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #555;
-}
-
-.input-group input {
+/* Card Styling */
+.reg-card {
   width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  transition: border 0.3s ease;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 24px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: #ffffff; 
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.input-group input:focus {
-  border-color: #4CAF50;
-  outline: none;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-}
-
-button[type="submit"] {
-  width: 100%;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-button[type="submit"]:hover {
-  background-color: #45a049;
-}
-
-.signup {
+/* Header */
+.reg-header {
   text-align: center;
-  margin-top: 15px;
-  font-size: 14px;
 }
 
-.signup a {
-  color: #4CAF50;
-  text-decoration: none;
-  font-weight: bold;
+.reg-brand {
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px;
+  color: #111;
+  margin-bottom: 6px !important;
 }
 
-.signup a:hover {
-  text-decoration: underline;
+.reg-subtitle {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: #222;
+  margin-bottom: 4px !important;
+}
+
+.reg-helper {
+  color: #666 !important;
+}
+
+/* Form & Rows Layout */
+.reg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reg-row-2 {
+  display: flex;
+  gap: 16px;
+}
+
+.reg-row-3 {
+  display: flex;
+  gap: 16px;
+}
+
+/* Inputs styling */
+.reg-input .MuiOutlinedInput-root {
+  border-radius: 14px;
+  background: #ffffff;
+  transition: border-color 0.15s ease;
+}
+
+.reg-input .MuiOutlinedInput-root fieldset {
+  border-color: rgba(17, 17, 17, 0.15);
+}
+
+.reg-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: rgba(17, 17, 17, 0.4);
+}
+
+.reg-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #111 !important;
+  border-width: 2px;
+}
+
+/* Radio / Gender adjustments */
+.reg-radio-group {
+  padding-left: 4px;
+}
+
+.reg-radio-label {
+  color: #333 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Register Button */
+.reg-btn {
+  background: #111 !important;
+  color: #ffe680 !important;
+  border-radius: 14px !important;
+  font-weight: 700 !important;
+  padding: 14px 0 !important;
+  text-transform: none !important;
+  font-size: 1rem !important;
+  margin-top: 10px !important;
+}
+
+/* Footer Link */
+.reg-login-text {
+  color: #555 !important;
+}
+
+.reg-login-link {
+  color: #111 !important;
+  font-weight: 700;
+}
+
+/* ======================================================= */
+/* SUPER ULTRA LIGHT RESPONSIVE FOR MOBILE (LAG FIX)      */
+/* ======================================================= */
+@media (max-width: 600px) {
+  /* 1. Mobile par lag karne wale heavy blobs ko bilkul gayab kar do */
+  .reg-bg-blob {
+    display: none !important;
+  }
+
+  .reg-page-root {
+    padding: 16px;
+    align-items: center;
+    background: #faf9f5 !important; /* Simple solid background */
+    
+    /* Hardware acceleration active rendering */
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  .reg-card {
+    padding: 24px 16px;
+    border-radius: 16px;
+    gap: 16px;
+    background: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    
+    /* Sare filters strictly disable */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* 2. Mobile par inputs ke heavy transition effect ko band karo */
+  .reg-input .MuiOutlinedInput-root,
+  .reg-input .MuiOutlinedInput-root fieldset {
+    transition: none !important;
+  }
+
+  .reg-row-2, .reg-row-3 {
+    flex-direction: column;
+    gap: 16px; /* consistent vertical spacing */
+  }
+
+  .reg-form {
+    gap: 16px;
+  }
+
+  .reg-brand {
+    font-size: 1.5rem !important;
+  }
+
+  .reg-subtitle {
+    font-size: 1.1rem !important;
+  }
 }

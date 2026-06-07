@@ -1,109 +1,159 @@
+/* ==========================================================================
+   1. PAGE ROOT & MODERN BACKGROUND
+   ========================================================================== */
 .admin-login-page-root {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #fffbe9 0%, #fff3b3 45%, #ffe680 100%);
+  background: linear-gradient(135deg, #fffcf0 0%, #fff6ca 50%, #ffe680 100%);
+  box-sizing: border-box;
 }
 
+/* Ambient Glow Blobs - Made much smoother using high blur radius */
 .admin-login-glow {
   position: absolute;
-  width: 320px;
-  height: 320px;
+  width: min(350px, 80vw);
+  height: min(350px, 80vw);
   border-radius: 50%;
-  background: rgba(255, 230, 128, 0.6);
-  filter: blur(8px);
+  background: rgba(255, 215, 0, 0.4);
+  filter: blur(80px); /* Increased blur from 8px to 80px for premium glass-ambient effect */
   z-index: 0;
+  pointer-events: none;
 }
 
 .admin-login-glow-left {
-  top: -80px;
-  left: -60px;
+  top: -10%;
+  left: -10%;
 }
 
 .admin-login-glow-right {
-  right: -80px;
-  bottom: -100px;
+  right: -10%;
+  bottom: -10%;
 }
 
+/* ==========================================================================
+   2. NEOMETRIC PREMIUM CARD
+   ========================================================================== */
 .admin-login-card {
   width: 100%;
   max-width: 420px;
-  padding: 30px 26px;
-  border-radius: 18px;
-  border: 3px solid #111;
+  padding: 40px 32px;
+  border-radius: 20px;
+  border: 2px solid #111111; /* Cleaned down slightly for micro-pixel accuracy */
   background: #ffffff;
-  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(17, 17, 17, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
 }
 
+/* Typography styles */
 .admin-login-brand {
   text-align: center;
-  font-size: 1.65rem;
-  font-weight: 800;
-  letter-spacing: 0.4px;
-  color: #111;
-  margin-bottom: 6px;
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #111111;
+  margin-bottom: 4px !important;
 }
 
 .admin-login-subtitle {
-  font-weight: 700;
-  color: #111;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  color: #111111;
+  margin-bottom: 6px !important;
 }
 
 .admin-login-helper {
-  color: #555;
-  margin-bottom: 8px;
+  color: #64748b !important; /* Modern Slate-gray color for better visual hierarchy */
+  font-weight: 500;
+  margin-bottom: 16px !important;
 }
 
+/* ==========================================================================
+   3. MATERIAL UI RESPONSIVE INPUT FIELDS & BUTTON
+   ========================================================================== */
 .admin-login-input .MuiOutlinedInput-root {
-  border-radius: 12px;
-  background: #fffef8;
+  border-radius: 14px;
+  background: #fffdf5;
+  transition: all 0.2s ease;
 }
 
 .admin-login-input .MuiOutlinedInput-root fieldset {
-  border-color: #e8d89a;
+  border-color: #e2d49e;
+  transition: border-color 0.2s ease;
 }
 
 .admin-login-input .MuiOutlinedInput-root:hover fieldset {
-  border-color: #c8ad3d;
+  border-color: #111111;
 }
 
 .admin-login-input .MuiOutlinedInput-root.Mui-focused fieldset {
-  border-color: #111;
-  border-width: 2px;
+  border-color: #111111 !important;
+  border-width: 2px !important;
 }
 
+/* Custom Typography Labels inside input boxes */
+.admin-login-input .MuiInputLabel-root.Mui-focused {
+  color: #111111 !important;
+}
+
+/* Interactive Premium Button Style */
 .admin-login-btn {
-  background: #111 !important;
+  background: #111111 !important;
   color: #ffe680 !important;
-  border: 2px solid #111 !important;
-  border-radius: 12px !important;
-  font-weight: 700 !important;
-  padding: 10px 0 !important;
+  border: 2px solid #111111 !important;
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+  padding: 12px 0 !important;
   text-transform: none !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.15);
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .admin-login-btn:hover {
   background: #ffe680 !important;
-  color: #111 !important;
+  color: #111111 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(255, 230, 128, 0.3);
 }
 
+.admin-login-btn:active {
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   4. STABLE CLEAN MOBILE MEDIA QUERY BREAKPOINT
+   ========================================================================== */
 @media (max-width: 480px) {
   .admin-login-page-root {
     padding: 16px;
+    align-items: center; /* Dynamic centering ensures no cutoff on short devices */
   }
 
   .admin-login-card {
-    padding: 22px 16px;
-    border-radius: 14px;
+    padding: 32px 20px;
+    border-radius: 16px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.06); /* Lighter shadow on small screen blocks */
   }
 
   .admin-login-brand {
-    font-size: 1.45rem;
+    font-size: 1.6rem;
+  }
+
+  .admin-login-subtitle {
+    font-size: 1.15rem !important;
+  }
+
+  .admin-login-btn {
+    padding: 11px 0 !important;
+    font-size: 0.95rem !important;
   }
 }

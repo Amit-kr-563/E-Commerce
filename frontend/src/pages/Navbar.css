@@ -32,6 +32,7 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .logo img {
@@ -43,12 +44,11 @@ body {
 
 .logo h1 {
   font-weight: 700;
-  margin: 0;   /* h1 ki default top-bottom margin ko zero kiya jo space bana rahi thi */
-  padding: 0;
   margin: 0;
+  padding: 0;
   color: black;
   font-size: 24px;
-  line-height: 60px;
+  line-height: 1;
 }
 
 /* ==========================================================================
@@ -335,10 +335,17 @@ body {
 
   .logo {
     order: 1;
+    align-self: flex-start;
+    margin-right: auto;
   }
 
   .icons {
     order: 2;
+  }
+
+  /* Hide the placeholder spacer on small screens so logo stays left-aligned */
+  .search1 {
+    display: none;
   }
 
   /* Search bar auto-adjusts to full width on next row */

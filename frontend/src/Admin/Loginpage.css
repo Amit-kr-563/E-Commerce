@@ -1,124 +1,185 @@
-
-
+/* Base Layout */
 .login-page-root {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 20px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #fffbe9 0%, #fff3b3 45%, #ffe680 100%);
+  background-color: #faf9f5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.login-page-glow {
+/* Premium Soft Blobs */
+.login-bg-blob {
   position: absolute;
-  width: 320px;
-  height: 320px;
+  width: 500px;
+  height: 500px;
   border-radius: 50%;
-  background: rgba(255, 230, 128, 0.6);
-  filter: blur(8px);
+  mix-blend-mode: multiply;
+  filter: blur(60px);
+  opacity: 0.6;
   z-index: 0;
+  pointer-events: none;
 }
 
-.login-page-glow-left {
-  top: -80px;
-  left: -60px;
+.blob-1 {
+  top: -150px;
+  left: -100px;
+  background: #ffe680;
 }
 
-.login-page-glow-right {
-  right: -80px;
-  bottom: -100px;
+.blob-2 {
+  bottom: -150px;
+  right: -100px;
+  background: #fff3b3;
 }
 
+/* Form Container Card */
 .login-card {
   width: 100%;
-  max-width: 420px;
-  padding: 30px 26px;
-  border-radius: 18px;
-  border: 3px solid #111;
-  background: #ffffff;
-  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.2);
+  max-width: 440px;
+  padding: 40px 32px;
+  border-radius: 24px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Header Styling */
+.login-header {
+  text-align: center;
 }
 
 .login-brand {
-  text-align: center;
-  font-size: 1.65rem;
-  font-weight: 800;
-  letter-spacing: 0.4px;
+  font-size: 1.85rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px;
   color: #111;
-  margin-bottom: 6px;
+  margin-bottom: 8px !important;
 }
 
 .login-subtitle {
-  font-weight: 700;
-  color: #111;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: #222;
+  margin-bottom: 4px !important;
 }
 
 .login-helper {
-  color: #555;
-  margin-bottom: 8px;
+  color: #666 !important;
+}
+
+/* Form Elements */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Inputs ke beech consistent space */
 }
 
 .login-input .MuiOutlinedInput-root {
-  border-radius: 12px;
-  background: #fffef8;
+  border-radius: 14px;
+  background: #ffffff;
+  transition: all 0.2s ease-in-out;
 }
 
 .login-input .MuiOutlinedInput-root fieldset {
-  border-color: #e8d89a;
+  border-color: rgba(17, 17, 17, 0.15);
+  transition: border-color 0.2s ease;
 }
 
 .login-input .MuiOutlinedInput-root:hover fieldset {
-  border-color: #c8ad3d;
+  border-color: rgba(17, 17, 17, 0.4);
 }
 
 .login-input .MuiOutlinedInput-root.Mui-focused fieldset {
-  border-color: #111;
+  border-color: #111 !important;
   border-width: 2px;
 }
 
+/* Premium Primary Button */
 .login-btn {
   background: #111 !important;
   color: #ffe680 !important;
-  border: 2px solid #111 !important;
-  border-radius: 12px !important;
+  border-radius: 14px !important;
   font-weight: 700 !important;
-  padding: 10px 0 !important;
+  padding: 12px 0 !important;
   text-transform: none !important;
+  font-size: 1rem !important;
+  transition: transform 0.1s ease, background-color 0.2s ease !important;
 }
 
 .login-btn:hover {
-  background: #ffe680 !important;
-  color: #111 !important;
+  background: #222 !important;
+  transform: translateY(-1px);
 }
 
+.login-btn:active {
+  transform: translateY(1px);
+}
+
+/* Footer / Switch link */
 .login-register-text {
-  color: #333;
+  color: #555 !important;
 }
 
 .login-register-link {
   color: #111 !important;
   font-weight: 700;
+  position: relative;
+  transition: color 0.2s ease;
 }
 
-.login-register-link:hover {
-  color: #000 !important;
+.login-register-link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #111;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
 }
 
+.login-register-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Responsive Styles for Mobile */
+/* Responsive Styles for Mobile */
 @media (max-width: 480px) {
   .login-page-root {
     padding: 16px;
+    align-items: center; /* Isse card mobile screen ke bilkul beech (center) me aa jayega */
   }
 
   .login-card {
-    padding: 22px 16px;
-    border-radius: 14px;
+    padding: 32px 20px;
+    border-radius: 20px;
+    gap: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   }
 
   .login-brand {
-    font-size: 1.45rem;
+    font-size: 1.6rem !important;
+  }
+  
+  .login-subtitle {
+    font-size: 1.15rem !important;
+  }
+
+  .login-btn {
+    padding: 14px 0 !important; 
   }
 }

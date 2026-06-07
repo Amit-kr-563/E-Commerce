@@ -97,12 +97,7 @@ function Navbar() {
 }, []);
 
 
-  const getUserName = () => {
-    if (loggedInUser?.user) {
-      return loggedInUser.user.name || loggedInUser.user.email?.split('@')[0] || 'User';
-    }
-    return null;
-  };
+  
 
   const fetchProducts = async () => {
     try {
@@ -310,23 +305,7 @@ function Navbar() {
           {/* ICONS SECTION */}
           <div className="icons" style={{ display: "flex", alignItems: "center", gap: "15px" }}>
             {/* Login/User Display */}
-            {loggedInUser && loggedInUser.user ? (
-              <div 
-                className="user-display-badge"
-                onClick={() => {
-                  const userRole = loggedInUser?.user?.role;
-                  if (userRole === 'seller') {
-                    navigate('/seller/dashboard');
-                  } else {
-                    navigate('/userinfo');
-                  }
-                }}
-                title="View Profile"
-              >
-                <i className="fas fa-user-circle"></i>
-                <span>{getUserName()}</span>
-              </div>
-            ) : (
+            {!loggedInUser || !loggedInUser.user ? (
               <Button
                 variant="contained"
                 size="small"
@@ -345,7 +324,7 @@ function Navbar() {
               >
                 Login
               </Button>
-            )}
+            ) : null}
 
             {/* Cart Icon */}
             <Link to="/cart" style={{ color: "black" }} className="cart-icon-link">
@@ -462,7 +441,7 @@ function Navbar() {
               <ListItemText primary="Admin" />
             </ListItem>
             <ListItem button onClick={() => handleOptionClick("/userinfo")}>
-              <ListItemText primary="About" />
+              <ListItemText primary="My Profile" />
             </ListItem>
             <ListItem button onClick={() => handleOptionClick("/my-orders")}>
               <ListItemText primary="My Orders" />

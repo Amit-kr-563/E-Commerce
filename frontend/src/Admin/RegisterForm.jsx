@@ -4,6 +4,7 @@ import {
     FormControl,
     FormControlLabel,
     FormLabel,
+    Link,
     Paper,
     Radio,
     RadioGroup,
@@ -11,9 +12,10 @@ import {
     Typography
 } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { addUser } from "../service/api"; // update with your path
+import { addUser } from "../service/api"; 
+import './RegisterForm.css'; // Sahi CSS path ensure karein
 
 function RegisterForm() {
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ function RegisterForm() {
     pincode: '',
     dob: '',
     gender: '',
-    role: 'user'  // Default role
+    role: 'user'  
   });
 
   const onChange = (e) => {
@@ -40,7 +42,6 @@ function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Client-side validations
     const mobileRegex = /^\d{10}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
@@ -74,42 +75,58 @@ function RegisterForm() {
   };
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-      <Paper elevation={1} sx={{ p: 4, width: "100%", maxWidth: 500 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          User Registration
-        </Typography>
-        <Typography variant="body2" align="center" sx={{ mb: 2, color: '#666' }}>
-          Create your account to start shopping
-        </Typography>
+    <Box className="reg-page-root">
+      {/* Background Soft Blobs */}
+      <div className="reg-bg-blob blob-1" aria-hidden="true" />
+      <div className="reg-bg-blob blob-2" aria-hidden="true" />
 
-        <form onSubmit={handleSubmit}>
+      <Paper elevation={0} className="reg-card">
+        <Box className="reg-header">
+          <Typography variant="h4" className="reg-brand">
+            SudoCart
+          </Typography>
+          <Typography variant="h5" className="reg-subtitle">
+            Create Account
+          </Typography>
+          <Typography variant="body2" className="reg-helper">
+            Join us to get the best shopping experience
+          </Typography>
+        </Box>
+
+        <form onSubmit={handleSubmit} className="reg-form">
           <TextField
             label="Full Name"
             name="name"
+            variant="outlined"
             fullWidth
-            sx={{ mt: 1 }}
+            className="reg-input"
             onChange={onChange}
             required
           />
-          <TextField
-            label="Mobile"
-            name="mobile"
-            fullWidth
-           sx={{ mt: 1 }}
-            onChange={onChange}
-            required
-          />
-          <TextField
-            label="Email"
-            name="email"
-            fullWidth
-          sx={{ mt: 1 }}
-            onChange={onChange}
-            required
-          />
-           <FormControl component="fieldset" margin="1" fullWidth>
-            <FormLabel component="legend" sx={{ mb: 1 }}>
+          
+          <Box className="reg-row-2">
+            <TextField
+              label="Mobile"
+              name="mobile"
+              variant="outlined"
+              fullWidth
+              className="reg-input"
+              onChange={onChange}
+              required
+            />
+            <TextField
+              label="Email"
+              name="email"
+              variant="outlined"
+              fullWidth
+              className="reg-input"
+              onChange={onChange}
+              required
+            />
+          </Box>
+
+          <FormControl component="fieldset" className="reg-radio-group" fullWidth>
+            <FormLabel component="legend" className="reg-radio-label">
               Gender
             </FormLabel>
             <RadioGroup
@@ -117,93 +134,105 @@ function RegisterForm() {
               name="gender"
               value={user.gender}
               onChange={onChange}
+              required
             >
-              <FormControlLabel value="male" control={<Radio />} label="Male" />
-              <FormControlLabel value="female" control={<Radio />} label="Female" />
-              <FormControlLabel value="other" control={<Radio />} label="Other" />
+              <FormControlLabel value="male" control={<Radio sx={{ color: '#111', '&.Mui-checked': { color: '#111' } }} />} label="Male" />
+              <FormControlLabel value="female" control={<Radio sx={{ color: '#111', '&.Mui-checked': { color: '#111' } }} />} label="Female" />
+              <FormControlLabel value="other" control={<Radio sx={{ color: '#111', '&.Mui-checked': { color: '#111' } }} />} label="Other" />
             </RadioGroup>
           </FormControl>
-          {/* Date of Birth */}
+
           <TextField
             type="date"
             name="dob"
+            variant="outlined"
             fullWidth
-           sx={{ mt: 1 }}
+            className="reg-input"
             onChange={onChange}
             InputLabelProps={{ shrink: true }}
             label="Date of Birth"
             required
           />
 
-          {/* Address Section */}
-         <TextField
-  label="Local Area / Address Line"
-  name="addressLine"
-  fullWidth
- sx={{ mt: 1,  mb:1}}
-  onChange={onChange}
-  required
-/>
+          <TextField
+            label="Local Area / Address Line"
+            name="addressLine"
+            variant="outlined"
+            fullWidth
+            className="reg-input"
+            onChange={onChange}
+            required
+          />
 
-<Box sx={{ display: "flex", gap: 2 }}>
-  <TextField
-    label="City"
-    name="city"
-    fullWidth
-    onChange={onChange}
-    required
-  />
-  <TextField
-    label="State"
-    name="state"
-    fullWidth
-    onChange={onChange}
-    required
-  />
-  <TextField
-    label="Pincode"
-    name="pincode"
-    fullWidth
-    onChange={onChange}
-    required
-  />
-</Box>
-          {/* Passwords */}
-          <TextField
-            type="password"
-            label="Password"
-            name="password"
-            fullWidth
-          sx={{ mt: 1 }}
-            onChange={onChange}
-            required
-          />
-          <TextField
-            type="password"
-            label="Confirm Password"
-            name="confirmPassword"
-            fullWidth
-          sx={{ mt: 1 }}
-            onChange={onChange}
-            required
-          />
+          <Box className="reg-row-3">
+            <TextField
+              label="City"
+              name="city"
+              variant="outlined"
+              fullWidth
+              className="reg-input"
+              onChange={onChange}
+              required
+            />
+            <TextField
+              label="State"
+              name="state"
+              variant="outlined"
+              fullWidth
+              className="reg-input"
+              onChange={onChange}
+              required
+            />
+            <TextField
+              label="Pincode"
+              name="pincode"
+              variant="outlined"
+              fullWidth
+              className="reg-input"
+              onChange={onChange}
+              required
+            />
+          </Box>
+
+          <Box className="reg-row-2">
+            <TextField
+              type="password"
+              label="Password"
+              name="password"
+              variant="outlined"
+              fullWidth
+              className="reg-input"
+              onChange={onChange}
+              required
+            />
+            <TextField
+              type="password"
+              label="Confirm Password"
+              name="confirmPassword"
+              variant="outlined"
+              fullWidth
+              className="reg-input"
+              onChange={onChange}
+              required
+            />
+          </Box>
 
           <Button
-            variant="contained"
-            color="primary"
             type="submit"
+            variant="contained"
             fullWidth
-            sx={{ mt: 2 }}
+            className="reg-btn"
+            disableElevation
           >
             Register
           </Button>
         </form>
 
-        <Typography sx={{ mt: 2 }} align="center">
+        <Typography className="reg-login-text" variant="body2" align="center">
           Already have an account?{" "}
-          <a href="/login" style={{ color: "#1976d2", textDecoration: "none" }}>
+          <Link component={RouterLink} to="/login" underline="none" className="reg-login-link">
             Login
-          </a>
+          </Link>
         </Typography>
       </Paper>
     </Box>
