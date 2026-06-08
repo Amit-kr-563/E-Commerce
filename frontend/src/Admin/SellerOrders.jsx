@@ -1,3 +1,6 @@
+
+
+// // export default SellerOrders;
 // import axios from 'axios';
 // import { useCallback, useEffect, useState } from 'react';
 // import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,8 +12,7 @@
 //   const navigate = useNavigate();
 //   const location = useLocation();
   
-//   // Get filter from navigation state or default to 'All'
-//   const [filter, setFilter] = useState(location.state?.filter || 'All'); // All, Ordered, Dispatched, Delivered
+//   const [filter, setFilter] = useState(location.state?.filter || 'All');
 
 //   const fetchOrders = useCallback(async () => {
 //     try {
@@ -43,21 +45,24 @@
 //     fetchOrders();
 //   }, [navigate, fetchOrders]);
 
-//   const updateOrderStatus = async (orderId, itemIndex, newStatus) => {
+//   // FIX: index ki jagah itemId use kar rahe hain taaki filter hone par bhi sahi item update ho
+//   const updateOrderStatus = async (orderId, itemId, newStatus) => {
 //     try {
 //       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
 //       const token = loggedInUser?.token;
+      
+//       // Backend URL updated to use item id
 //       await axios.put(
-//         `http://localhost:8000/api/seller/order/${orderId}/item/${itemIndex}/status`,
+//         `http://localhost:8000/api/seller/order/${orderId}/item/${itemId}/status`,
 //         { status: newStatus },
 //         { headers: { Authorization: `Bearer ${token}` } }
 //       );
       
 //       alert(`Order status updated to ${newStatus}`);
-//       fetchOrders(); // Refresh orders
+//       fetchOrders(); 
 //     } catch (error) {
 //       console.error('Error updating order status:', error);
-//       alert('Failed to update order status');
+//       alert(error.response?.data?.message || 'Failed to update order status');
 //     }
 //   };
 
@@ -94,35 +99,13 @@
 //         <h1>📦 My Orders</h1>
 //       </div>
 
-//       {/* Filter Buttons */}
 //       <div className="filter-buttons">
-//         <button 
-//           className={`filter-btn ${filter === 'All' ? 'active' : ''}`}
-//           onClick={() => setFilter('All')}
-//         >
-//           All Orders
-//         </button>
-//         <button 
-//           className={`filter-btn ${filter === 'Ordered' ? 'active' : ''}`}
-//           onClick={() => setFilter('Ordered')}
-//         >
-//           🛒 Ordered
-//         </button>
-//         <button 
-//           className={`filter-btn ${filter === 'Dispatched' ? 'active' : ''}`}
-//           onClick={() => setFilter('Dispatched')}
-//         >
-//           📦 Dispatched
-//         </button>
-//         <button 
-//           className={`filter-btn ${filter === 'Delivered' ? 'active' : ''}`}
-//           onClick={() => setFilter('Delivered')}
-//         >
-//           ✅ Delivered
-//         </button>
+//         <button className={`filter-btn ${filter === 'All' ? 'active' : ''}`} onClick={() => setFilter('All')}>All Orders</button>
+//         <button className={`filter-btn ${filter === 'Ordered' ? 'active' : ''}`} onClick={() => setFilter('Ordered')}>🛒 Ordered</button>
+//         <button className={`filter-btn ${filter === 'Dispatched' ? 'active' : ''}`} onClick={() => setFilter('Dispatched')}>📦 Dispatched</button>
+//         <button className={`filter-btn ${filter === 'Delivered' ? 'active' : ''}`} onClick={() => setFilter('Delivered')}>✅ Delivered</button>
 //       </div>
 
-//       {/* Orders List */}
 //       {filteredOrders.length === 0 ? (
 //         <div className="no-orders">
 //           <h2>No orders found</h2>
@@ -137,17 +120,13 @@
 //                   <h3>Order ID: {order._id.slice(-8).toUpperCase()}</h3>
 //                   <p className="order-date">
 //                     {new Date(order.createdAt).toLocaleDateString('en-IN', {
-//                       year: 'numeric',
-//                       month: 'long',
-//                       day: 'numeric',
-//                       hour: '2-digit',
-//                       minute: '2-digit'
+//                       year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
 //                     })}
 //                   </p>
 //                 </div>
 //                 <div className="order-total">
 //                   <span>Order Total</span>
-//                   <h2>₹{order.orderTotal?.toLocaleString()}</h2>
+//                   <h2>₹{order.totalAmount?.toLocaleString() || order.orderTotal?.toLocaleString()}</h2>
 //                 </div>
 //               </div>
 
@@ -162,8 +141,9 @@
 
 //               <div className="order-items">
 //                 <h4>Ordered Products:</h4>
-//                 {order.cartItems.map((item, index) => (
-//                   <div key={index} className="order-item">
+//                 {order.cartItems.map((item) => (
+//                   // Map mein key ke liye hamesha unique item._id use karein
+//                   <div key={item._id || item.productId} className="order-item">
 //                     <img src={item.img} alt={item.name} />
 //                     <div className="item-details">
 //                       <h4>{item.name}</h4>
@@ -177,7 +157,7 @@
 //                       <div className="status-actions">
 //                         {item.status === 'Ordered' && (
 //                           <button 
-//                             onClick={() => updateOrderStatus(order._id, index, 'Dispatched')}
+//                             onClick={() => updateOrderStatus(order._id, item._id, 'Dispatched')} // FIX: item._id bhej rahe hain
 //                             className="action-btn dispatch-btn"
 //                           >
 //                             Mark as Dispatched
@@ -185,7 +165,7 @@
 //                         )}
 //                         {item.status === 'Dispatched' && (
 //                           <button 
-//                             onClick={() => updateOrderStatus(order._id, index, 'Delivered')}
+//                             onClick={() => updateOrderStatus(order._id, item._id, 'Delivered')} // FIX: item._id bhej rahe hain
 //                             className="action-btn deliver-btn"
 //                           >
 //                             Mark as Delivered
@@ -208,8 +188,10 @@
 // }
 
 // export default SellerOrders;
+
+
 import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './SellerOrders.css';
 
@@ -219,9 +201,23 @@ function SellerOrders() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [filter, setFilter] = useState(location.state?.filter || 'All');
+  // Get filter from navigation state or default to 'All'
+  const [filter, setFilter] = useState(location.state?.filter || 'All'); // All, Ordered, Dispatched, Delivered
 
-  const fetchOrders = useCallback(async () => {
+  useEffect(() => {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const token = loggedInUser?.token;
+    const userRole = loggedInUser?.user?.role;
+    
+    if (!token || userRole !== 'seller') {
+      navigate('/login');
+      return;
+    }
+
+    fetchOrders();
+  }, [navigate]);
+
+  const fetchOrders = async () => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
@@ -237,39 +233,23 @@ function SellerOrders() {
         navigate('/login');
       }
     }
-  }, [navigate]);
+  };
 
-  useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    const token = loggedInUser?.token;
-    const userRole = loggedInUser?.user?.role;
-    
-    if (!token || userRole !== 'seller') {
-      navigate('/login');
-      return;
-    }
-
-    fetchOrders();
-  }, [navigate, fetchOrders]);
-
-  // FIX: index ki jagah itemId use kar rahe hain taaki filter hone par bhi sahi item update ho
-  const updateOrderStatus = async (orderId, itemId, newStatus) => {
+  const updateOrderStatus = async (orderId, itemIndex, newStatus) => {
     try {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
-      
-      // Backend URL updated to use item id
       await axios.put(
-        `http://localhost:8000/api/seller/order/${orderId}/item/${itemId}/status`,
+        `http://localhost:8000/api/seller/order/${orderId}/item/${itemIndex}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       alert(`Order status updated to ${newStatus}`);
-      fetchOrders(); 
+      fetchOrders(); // Refresh orders
     } catch (error) {
       console.error('Error updating order status:', error);
-      alert(error.response?.data?.message || 'Failed to update order status');
+      alert('Failed to update order status');
     }
   };
 
@@ -306,13 +286,35 @@ function SellerOrders() {
         <h1>📦 My Orders</h1>
       </div>
 
+      {/* Filter Buttons */}
       <div className="filter-buttons">
-        <button className={`filter-btn ${filter === 'All' ? 'active' : ''}`} onClick={() => setFilter('All')}>All Orders</button>
-        <button className={`filter-btn ${filter === 'Ordered' ? 'active' : ''}`} onClick={() => setFilter('Ordered')}>🛒 Ordered</button>
-        <button className={`filter-btn ${filter === 'Dispatched' ? 'active' : ''}`} onClick={() => setFilter('Dispatched')}>📦 Dispatched</button>
-        <button className={`filter-btn ${filter === 'Delivered' ? 'active' : ''}`} onClick={() => setFilter('Delivered')}>✅ Delivered</button>
+        <button 
+          className={`filter-btn ${filter === 'All' ? 'active' : ''}`}
+          onClick={() => setFilter('All')}
+        >
+          All Orders
+        </button>
+        <button 
+          className={`filter-btn ${filter === 'Ordered' ? 'active' : ''}`}
+          onClick={() => setFilter('Ordered')}
+        >
+          🛒 Ordered
+        </button>
+        <button 
+          className={`filter-btn ${filter === 'Dispatched' ? 'active' : ''}`}
+          onClick={() => setFilter('Dispatched')}
+        >
+          📦 Dispatched
+        </button>
+        <button 
+          className={`filter-btn ${filter === 'Delivered' ? 'active' : ''}`}
+          onClick={() => setFilter('Delivered')}
+        >
+          ✅ Delivered
+        </button>
       </div>
 
+      {/* Orders List */}
       {filteredOrders.length === 0 ? (
         <div className="no-orders">
           <h2>No orders found</h2>
@@ -327,13 +329,17 @@ function SellerOrders() {
                   <h3>Order ID: {order._id.slice(-8).toUpperCase()}</h3>
                   <p className="order-date">
                     {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })}
                   </p>
                 </div>
                 <div className="order-total">
                   <span>Order Total</span>
-                  <h2>₹{order.totalAmount?.toLocaleString() || order.orderTotal?.toLocaleString()}</h2>
+                  <h2>₹{order.orderTotal?.toLocaleString()}</h2>
                 </div>
               </div>
 
@@ -348,9 +354,8 @@ function SellerOrders() {
 
               <div className="order-items">
                 <h4>Ordered Products:</h4>
-                {order.cartItems.map((item) => (
-                  // Map mein key ke liye hamesha unique item._id use karein
-                  <div key={item._id || item.productId} className="order-item">
+                {order.cartItems.map((item, index) => (
+                  <div key={index} className="order-item">
                     <img src={item.img} alt={item.name} />
                     <div className="item-details">
                       <h4>{item.name}</h4>
@@ -364,7 +369,7 @@ function SellerOrders() {
                       <div className="status-actions">
                         {item.status === 'Ordered' && (
                           <button 
-                            onClick={() => updateOrderStatus(order._id, item._id, 'Dispatched')} // FIX: item._id bhej rahe hain
+                            onClick={() => updateOrderStatus(order._id, index, 'Dispatched')}
                             className="action-btn dispatch-btn"
                           >
                             Mark as Dispatched
@@ -372,7 +377,7 @@ function SellerOrders() {
                         )}
                         {item.status === 'Dispatched' && (
                           <button 
-                            onClick={() => updateOrderStatus(order._id, item._id, 'Delivered')} // FIX: item._id bhej rahe hain
+                            onClick={() => updateOrderStatus(order._id, index, 'Delivered')}
                             className="action-btn deliver-btn"
                           >
                             Mark as Delivered
