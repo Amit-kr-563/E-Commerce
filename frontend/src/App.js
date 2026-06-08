@@ -24,6 +24,8 @@ import WatchlistPage from "./components/Watchlistpage";
 import Womenpage from "./components/Womenpage";
 import Companyinfo from './pages/Companyinfo';
 import ContectSection from './pages/Contectsection';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsConditions from './pages/TermsConditions';
 import Productdetail from "./pages/Productdetail";
 
 function App(props) {
@@ -38,6 +40,8 @@ function App(props) {
         <Route path="/login" exact element={<Loginpage  setLoggedInUser={setLoggedInUser}/>} />
         <Route path="/userinfo" element={<AboutPage user={loggedInUser} />} />
         <Route path="/aboutus" exact element={<Companyinfo/>} />
+        <Route path="/privacy-policy" exact element={<PrivacyPolicy/>} />
+        <Route path="/terms-and-conditions" exact element={<TermsConditions/>} />
         
         {/* Registration Routes */}
         <Route path="/register" exact element={<RegisterChoice />} />

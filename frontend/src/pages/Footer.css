@@ -47,7 +47,18 @@
   transition: color 0.3s;
 }
 
+.footer-section ul li .footer-link {
+  text-decoration: none;
+  color: #222;
+  transition: color 0.3s;
+  display: inline-flex;
+}
+
 .footer-section ul li a:hover {
+  color: #000;
+}
+
+.footer-section ul li .footer-link:hover {
   color: #000;
 }
 
@@ -93,6 +104,12 @@
     justify-content: center;
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .footer-section ul li a,
+  .footer-section ul li .footer-link {
+    justify-content: center;
+    width: 100%;
   }
 }
 

@@ -1,10 +1,7 @@
 import "./Footer.css";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
-  const handlePlaceholderClick = (event) => {
-    event.preventDefault();
-  };
-
   return (
     <>
       <footer className="footer">
@@ -34,11 +31,10 @@ export default function Footer() {
             <h3>Important Links</h3>
             
             <ul>
-              <li><a href="/aboutus">About Us</a></li>
-               <li><a href="/contect">Let's Connect</a></li>
-              <li><button type="button" onClick={handlePlaceholderClick} className="footer-link-button">Privacy Policy</button></li>
-             
-              <li><button type="button" onClick={handlePlaceholderClick} className="footer-link-button">Terms & Conditions</button></li>
+              <li><Link to="/aboutus" className="footer-link">About Us</Link></li>
+              <li><Link to="/contect" className="footer-link">Let's Connect</Link></li>
+              <li><Link to="/privacy-policy" className="footer-link">Privacy Policy</Link></li>
+              <li><Link to="/terms-and-conditions" className="footer-link">Terms & Conditions</Link></li>
             </ul>
         
           </div>
