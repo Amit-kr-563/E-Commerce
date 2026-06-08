@@ -443,31 +443,41 @@ router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
 });
 
 // Update order item status
-router.put('/api/seller/order/:orderId/item/:itemIndex/status', verifyToken, async (req, res) => {
+router.put('/api/seller/order/:orderId/item/:itemId/status', verifyToken, async (req, res) => {
   try {
-    const { orderId, itemIndex } = req.params;
+    const { orderId, itemId } = req.params;
     const { status } = req.body;
-    const sellerId = req.userId;
-    
-    const order = await Order.findById(orderId);
-    
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+    const sellerId = req.userId; // verifyToken se sellerId mil rahi hai
+
+    // 1. Valid Status Check
+    const allowedStatus = ['Ordered', 'Dispatched', 'Delivered', 'Cancelled'];
+    if (!allowedStatus.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
     }
-    
-    const item = order.cartItems[itemIndex];
-    
-    if (!item || item.sellerId.toString() !== sellerId.toString()) {
-      return res.status(403).json({ message: "Unauthorized" });
+
+    // 2. Find and Update only if this item belongs to the logged-in seller
+    const updatedOrder = await Order.findOneAndUpdate(
+      { 
+        _id: orderId, 
+        'cartItems._id': itemId,
+        'cartItems.sellerId': sellerId // Security: ensure seller owns this product item
+      },
+      { 
+        $set: { 'cartItems.$.status': status } 
+      },
+      { new: true } 
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ 
+        message: 'Order or Item not found, or you do not have permission to update this item.' 
+      });
     }
-    
-    item.status = status;
-    await order.save();
-    
-    res.status(200).json({ message: "Order status updated successfully", order });
-  } catch (err) {
-    console.error("Failed to update order status:", err);
-    res.status(500).json({ message: "Server error" });
+
+    res.status(200).json({ message: 'Status updated successfully', updatedOrder });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 });
 
