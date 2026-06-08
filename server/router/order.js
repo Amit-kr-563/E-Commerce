@@ -8,11 +8,72 @@ const verifyToken = require('../middleware/authMiddleware');
 
 console.log("Order routes loaded");
 
+// router.post('/order', async (req, res) => {
+//   try {
+//     const payload = { ...req.body };
+
+//     // Normalize user fields so My Orders works reliably even if frontend sends partial user data.
+//     if (payload.userId) {
+//       const dbUser = await User.findById(payload.userId).select('email mobile name');
+//       if (dbUser) {
+//         payload.username = payload.username || dbUser.email || dbUser.mobile;
+//         payload.email = payload.email || dbUser.email;
+//         payload.mobile = payload.mobile || dbUser.mobile;
+//         payload.fullName = payload.fullName || dbUser.name;
+//       }
+//     }
+
+//     console.log("=== ORDER CREATION DEBUG ===");
+//     console.log("Cart Items:", JSON.stringify(payload.cartItems, null, 2));
+//     console.log("Full Order Data:", JSON.stringify(payload, null, 2));
+    
+//     const order = new Order(payload);
+//     await order.save();
+    
+//     console.log("Order saved successfully with ID:", order._id);
+//     console.log("Seller IDs in order:", order.cartItems.map(item => item.sellerId));
+    
+//     // Decrement product stock for each ordered item
+//     try {
+//       for (const item of order.cartItems) {
+//         if (!item.productId) continue;
+
+//         try {
+//           const product = await Product.findById(item.productId);
+//           if (!product) {
+//             console.warn(`Product not found for id ${item.productId}`);
+//             continue;
+//           }
+
+//           const orderedQty = Number(item.quantity) || 0;
+//           const currentStock = Number(product.stock) || 0;
+//           const newStock = Math.max(currentStock - orderedQty, 0);
+
+//           // Only save if stock actually changed
+//           if (newStock !== currentStock) {
+//             product.stock = newStock;
+//             await product.save();
+//             console.log(`Product ${product._id} stock updated: ${currentStock} -> ${newStock}`);
+//           }
+//         } catch (err) {
+//           console.error('Failed updating stock for product', item.productId, err);
+//         }
+//       }
+//     } catch (err) {
+//       console.error('Error while updating product stocks after order save:', err);
+//     }
+    
+//     res.status(201).json({ message: "Order placed successfully", orderId: order._id });
+//   } catch (err) {
+//     console.error("Order Save Error:", err);
+//     res.status(500).json({ error: "Failed to place order" });
+//   }
+// });
+
 router.post('/order', async (req, res) => {
   try {
     const payload = { ...req.body };
 
-    // Normalize user fields so My Orders works reliably even if frontend sends partial user data.
     if (payload.userId) {
       const dbUser = await User.findById(payload.userId).select('email mobile name');
       if (dbUser) {
@@ -23,44 +84,38 @@ router.post('/order', async (req, res) => {
       }
     }
 
-    console.log("=== ORDER CREATION DEBUG ===");
-    console.log("Cart Items:", JSON.stringify(payload.cartItems, null, 2));
-    console.log("Full Order Data:", JSON.stringify(payload, null, 2));
-    
     const order = new Order(payload);
     await order.save();
     
-    console.log("Order saved successfully with ID:", order._id);
-    console.log("Seller IDs in order:", order.cartItems.map(item => item.sellerId));
-    
-    // Decrement product stock for each ordered item
+    // 🔥 STOCK DECREMENT LOGIC (SAFE VERSION)
     try {
       for (const item of order.cartItems) {
-        if (!item.productId) continue;
+        // Frontend se ya to productId aayega ya _id, dono ko accept karo
+        const targetId = item.productId || item._id; 
 
-        try {
-          const product = await Product.findById(item.productId);
-          if (!product) {
-            console.warn(`Product not found for id ${item.productId}`);
-            continue;
-          }
+        if (!targetId) {
+          console.log(`⚠️ Product ID missing for item: ${item.name}`);
+          continue; 
+        }
 
+        // Database se product dhoondho
+        const product = await Product.findById(targetId);
+        
+        if (product) {
           const orderedQty = Number(item.quantity) || 0;
           const currentStock = Number(product.stock) || 0;
-          const newStock = Math.max(currentStock - orderedQty, 0);
 
-          // Only save if stock actually changed
-          if (newStock !== currentStock) {
-            product.stock = newStock;
-            await product.save();
-            console.log(`Product ${product._id} stock updated: ${currentStock} -> ${newStock}`);
-          }
-        } catch (err) {
-          console.error('Failed updating stock for product', item.productId, err);
+          // Naya stock zero se kam nahi hona chahiye
+          product.stock = Math.max(currentStock - orderedQty, 0);
+          await product.save();
+          
+          console.log(`⚡ STOCK UPDATED: ${product.name} | Purana: ${currentStock} -> Naya: ${product.stock}`);
+        } else {
+          console.log(`❌ Product not found in DB with ID: ${targetId}`);
         }
       }
-    } catch (err) {
-      console.error('Error while updating product stocks after order save:', err);
+    } catch (stockErr) {
+      console.error("Stock update karne me error aaya:", stockErr);
     }
     
     res.status(201).json({ message: "Order placed successfully", orderId: order._id });
@@ -79,6 +134,8 @@ router.get('/order/all', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
 
 // Get seller's orders - orders containing seller's products
 router.get('/api/seller/orders', verifyToken, async (req, res) => {
@@ -132,17 +189,55 @@ router.get('/api/seller/orders', verifyToken, async (req, res) => {
 });
 
 // Get seller order analytics
+// router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
+//   try {
+//     console.log("Order analytics endpoint hit");
+//     const sellerId = req.userId;
+//     console.log("Seller ID:", sellerId);
+    
+//     const orders = await Order.find({
+//       'cartItems.sellerId': sellerId
+//     });
+    
+//     let totalOrders = 0;
+//     let orderedCount = 0;
+//     let dispatchedCount = 0;
+//     let deliveredCount = 0;
+//     let totalRevenue = 0;
+    
+//     orders.forEach(order => {
+//       order.cartItems.forEach(item => {
+//         if (item.sellerId && item.sellerId.toString() === sellerId.toString()) {
+//           totalOrders++;
+//           totalRevenue += item.price * item.quantity;
+          
+//           if (item.status === 'Ordered') orderedCount++;
+//           else if (item.status === 'Dispatched') dispatchedCount++;
+//           else if (item.status === 'Delivered') deliveredCount++;
+//         }
+//       });
+//     });
+    
+//     res.status(200).json({
+//       totalOrders,
+//       orderedCount,
+//       dispatchedCount,
+//       deliveredCount,
+//       totalRevenue
+//     });
+//   } catch (err) {
+//     console.error("Failed to get order analytics:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
+// Get seller order analytics
 router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
   try {
-    console.log("Order analytics endpoint hit");
     const sellerId = req.userId;
-    console.log("Seller ID:", sellerId);
+    const orders = await Order.find({ 'cartItems.sellerId': sellerId });
     
-    const orders = await Order.find({
-      'cartItems.sellerId': sellerId
-    });
-    
-    let totalOrders = 0;
+    let totalOrders = orders.length;
     let orderedCount = 0;
     let dispatchedCount = 0;
     let deliveredCount = 0;
@@ -151,12 +246,18 @@ router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
     orders.forEach(order => {
       order.cartItems.forEach(item => {
         if (item.sellerId && item.sellerId.toString() === sellerId.toString()) {
-          totalOrders++;
-          totalRevenue += item.price * item.quantity;
           
-          if (item.status === 'Ordered') orderedCount++;
-          else if (item.status === 'Dispatched') dispatchedCount++;
-          else if (item.status === 'Delivered') deliveredCount++;
+          const currentStatus = item.status || 'Ordered'; 
+          
+          if (currentStatus === 'Ordered') {
+            orderedCount++;
+          } else if (currentStatus === 'Dispatched') {
+            dispatchedCount++;
+          } else if (currentStatus === 'Delivered') {
+            deliveredCount++;
+            // 💰 REVENUE FIXED: Sirf delivered items ka paisa total revenue me judega
+            totalRevenue += (Number(item.price) || 0) * (Number(item.quantity) || 0);
+          }
         }
       });
     });
@@ -170,35 +271,6 @@ router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
     });
   } catch (err) {
     console.error("Failed to get order analytics:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Update order item status
-router.put('/api/seller/order/:orderId/item/:itemIndex/status', verifyToken, async (req, res) => {
-  try {
-    const { orderId, itemIndex } = req.params;
-    const { status } = req.body;
-    const sellerId = req.userId;
-    
-    const order = await Order.findById(orderId);
-    
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-    
-    const item = order.cartItems[itemIndex];
-    
-    if (!item || item.sellerId.toString() !== sellerId.toString()) {
-      return res.status(403).json({ message: "Unauthorized" });
-    }
-    
-    item.status = status;
-    await order.save();
-    
-    res.status(200).json({ message: "Order status updated successfully", order });
-  } catch (err) {
-    console.error("Failed to update order status:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

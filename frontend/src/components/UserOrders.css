@@ -600,3 +600,141 @@
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
+
+
+
+
+/* ========================================================
+   🛍️ MODERN & PREMIUM ORDERS LOADING SCREEN STYLES
+   ======================================================== */
+
+.modern-orders-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.75); /* Soft bright background */
+  backdrop-filter: blur(16px); /* High-end glassmorphism effect */
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.modern-orders-loading-card {
+  background: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.01);
+  text-align: center;
+  max-width: 390px;
+  width: 88%;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  animation: cardScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.orders-spinner-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Outer breathing glow effect */
+.outer-pulse-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(79, 70, 229, 0.05); /* Tinted Indigo color */
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+/* High-speed sleek loader ring */
+.inner-rotating-loop {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3.5px solid rgba(79, 70, 229, 0.08);
+  border-top-color: #4f46e5; /* Primary Brand Color */
+  border-radius: 50%;
+  animation: singleSpin 0.9s linear infinite;
+}
+
+.center-orders-icon {
+  font-size: 1.6rem;
+  color: #4f46e5;
+  animation: subtleBreathe 1.8s ease-in-out infinite;
+}
+
+.modern-orders-loading-card h3 {
+  font-size: 1.35rem;
+  color: #111827;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.3px;
+}
+
+.modern-orders-loading-card p {
+  font-size: 0.88rem;
+  color: #6b7280;
+  margin: 0 0 1.75rem 0;
+  line-height: 1.5;
+}
+
+/* Linear loop line indicator */
+.sleek-progress-container {
+  width: 100%;
+  height: 4px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sleek-progress-line {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #818cf8);
+  border-radius: 10px;
+  animation: flowingLine 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================================
+   🎬 ANIMATIONS
+   ======================================================== */
+
+@keyframes cardScaleUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes singleSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+
+@keyframes subtleBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@keyframes flowingLine {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(250%); }
+}

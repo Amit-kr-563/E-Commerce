@@ -176,10 +176,45 @@ router.delete('/api/products/:id', verifyToken, async (req, res) => {
 });
 
 // Get product analytics for seller
+// router.get('/api/seller/analytics', verifyToken, async (req, res) => {
+//   try {
+//     const products = await Product.find({ seller: req.userId });
+    
+//     const analytics = {
+//       totalProducts: products.length,
+//       categories: {
+//         Men: products.filter(p => p.category === 'Men').length,
+//         Women: products.filter(p => p.category === 'Women').length,
+//         Kids: products.filter(p => p.category === 'Kids').length
+//       },
+//       totalStock: products.reduce((sum, p) => sum + p.stock, 0),
+//       totalValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0)
+//     };
+    
+//     res.status(200).json(analytics);
+//   } catch (error) {
+//     console.log("Analytics Error:", error);
+//     res.status(500).json({ message: "Something went wrong" });
+//   }
+// });
+
+// Get product analytics for seller
 router.get('/api/seller/analytics', verifyToken, async (req, res) => {
   try {
     const products = await Product.find({ seller: req.userId });
     
+    // Safety ke saath live calculation
+    const totalStock = products.reduce((sum, p) => {
+      const currentStock = Number(p.stock) || 0; // String ko Number banaya
+      return sum + currentStock;
+    }, 0);
+
+    const totalValue = products.reduce((sum, p) => {
+      const currentPrice = Number(p.price) || 0;
+      const currentStock = Number(p.stock) || 0;
+      return sum + (currentPrice * currentStock); // Live Total Value
+    }, 0);
+
     const analytics = {
       totalProducts: products.length,
       categories: {
@@ -187,8 +222,8 @@ router.get('/api/seller/analytics', verifyToken, async (req, res) => {
         Women: products.filter(p => p.category === 'Women').length,
         Kids: products.filter(p => p.category === 'Kids').length
       },
-      totalStock: products.reduce((sum, p) => sum + p.stock, 0),
-      totalValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0)
+      totalStock: totalStock,
+      totalValue: totalValue
     };
     
     res.status(200).json(analytics);

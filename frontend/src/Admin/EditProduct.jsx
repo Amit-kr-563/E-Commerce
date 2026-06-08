@@ -142,16 +142,37 @@ function EditProduct() {
     }
   };
 
+  // if (loading) {
+  //   return (
+  //     <div className="loading-container">
+  //       <div className="loading-spinner">
+  //         <i className="fas fa-spinner fa-spin"></i>
+  //         <p>Loading product...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner">
-          <i className="fas fa-spinner fa-spin"></i>
-          <p>Loading product...</p>
+      <div className="modern-loading-container">
+        <div className="modern-loading-card">
+          <div className="spinner-glow-ring">
+            <div className="inner-rotating-loop"></div>
+            <div className="center-box-avatar">
+              <i className="fas fa-edit"></i>
+            </div>
+          </div>
+          <h3>Fetching Data</h3>
+          
+          <div className="infinite-bar-track">
+            <div className="infinite-bar-fill"></div>
+          </div>
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="product-form-container">

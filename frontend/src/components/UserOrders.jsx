@@ -147,11 +147,32 @@ function UserOrders() {
     }
   };
 
+  // if (loading) {
+  //   return (
+  //     <div className="loading-container">
+  //       <div className="loading-spinner"></div>
+  //       <p>Loading your orders...</p>
+  //     </div>
+  //   );
+  // }
+
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading your orders...</p>
+      <div className="modern-orders-loading-overlay">
+        <div className="modern-orders-loading-card">
+          <div className="orders-spinner-wrapper">
+            <div className="outer-pulse-ring"></div>
+            <div className="inner-rotating-loop"></div>
+            <div className="center-orders-icon">
+              <i className="fas fa-shopping-bag"></i>
+            </div>
+          </div>
+          <h3>Loading Your Orders</h3>
+          <p>Please wait while we sync your purchase history securely...</p>
+          <div className="sleek-progress-container">
+            <div className="sleek-progress-line"></div>
+          </div>
+        </div>
       </div>
     );
   }

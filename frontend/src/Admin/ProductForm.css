@@ -706,3 +706,126 @@
 .product-form {
   animation: fadeIn 0.6s ease-out;
 }
+
+
+
+
+
+/* ========================================================
+   💎 PREMIUM GLASSMORPHISM LOADING SCREEN STYLES
+   ======================================================== */
+
+.modern-loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.75); /* Clean bright overlay */
+  backdrop-filter: blur(16px); /* Premium soft blur background */
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.modern-loading-card {
+  background: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.01);
+  text-align: center;
+  max-width: 380px;
+  width: 85%;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  animation: smoothFadeUp 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.spinner-glow-ring {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 1.5rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inner-rotating-loop {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3.5px solid rgba(79, 70, 229, 0.08); /* Indigo tinted base track */
+  border-top-color: #4f46e5; /* Main Brand color */
+  border-radius: 50%;
+  animation: customSpin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.center-box-avatar {
+  font-size: 1.5rem;
+  color: #4f46e5;
+  animation: softPulse 2s ease-in-out infinite;
+}
+
+.modern-loading-card h3 {
+  font-size: 1.35rem;
+  color: #111827;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.3px;
+}
+
+.modern-loading-card p {
+  font-size: 0.88rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+/* Linear progress indicator at the bottom */
+.infinite-bar-track {
+  width: 100%;
+  height: 3.5px;
+  background: #f3f4f6;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.infinite-bar-fill {
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  border-radius: 100px;
+  animation: linearSlide 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================================
+   🎬 TIME-BASED EASING ANIMATIONS
+   ======================================================== */
+
+@keyframes smoothFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes customSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes softPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@keyframes linearSlide {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(230%); }
+}
