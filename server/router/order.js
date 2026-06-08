@@ -337,6 +337,58 @@ console.log("Order routes loaded");
 // ==========================================
 // 1. PLACE ORDER ROUTE
 // ==========================================
+// router.post('/order', async (req, res) => {
+//   try {
+//     const payload = { ...req.body };
+
+//     if (payload.userId) {
+//       const dbUser = await User.findById(payload.userId).select('email mobile name');
+//       if (dbUser) {
+//         payload.username = payload.username || dbUser.email || dbUser.mobile;
+//         payload.email = payload.email || dbUser.email;
+//         payload.mobile = payload.mobile || dbUser.mobile;
+//         payload.fullName = payload.fullName || dbUser.name;
+//       }
+//     }
+
+//     const order = new Order(payload);
+//     await order.save();
+    
+//     // STOCK DECREMENT LOGIC
+//     try {
+//       for (const item of order.cartItems) {
+//         const targetId = item.productId || item._id; 
+
+//         if (!targetId) {
+//           console.log(`⚠️ Product ID missing for item: ${item.name}`);
+//           continue; 
+//         }
+
+//         const product = await Product.findById(targetId);
+        
+//         if (product) {
+//           const orderedQty = Number(item.quantity) || 0;
+//           const currentStock = Number(product.stock) || 0;
+
+//           product.stock = Math.max(currentStock - orderedQty, 0);
+//           await product.save();
+          
+//           console.log(`⚡ STOCK UPDATED: ${product.name} | Purana: ${currentStock} -> Naya: ${product.stock}`);
+//         } else {
+//           console.log(`❌ Product not found in DB with ID: ${targetId}`);
+//         }
+//       }
+//     } catch (stockErr) {
+//       console.error("Stock update karne me error aaya:", stockErr);
+//     }
+    
+//     res.status(201).json({ message: "Order placed successfully", orderId: order._id });
+//   } catch (err) {
+//     console.error("Order Save Error:", err);
+//     res.status(500).json({ error: "Failed to place order" });
+//   }
+// });
+
 router.post('/order', async (req, res) => {
   try {
     const payload = { ...req.body };
@@ -351,25 +403,33 @@ router.post('/order', async (req, res) => {
       }
     }
 
+    // 💡 TRICK: Mongoose save hone se PEHLE hi frontend se aane wali original product ids ko extract kar lo
+    // Kyunki save() hone ke baad order.cartItems ke andar ki _id badal kar sub-document id ban jayegi.
+    const originalProductIds = payload.cartItems.map(item => item.productId || item._id);
+
     const order = new Order(payload);
     await order.save();
     
-    // STOCK DECREMENT LOGIC
+    // 🔥 STOCK DECREMENT LOGIC (FIXED)
     try {
-      for (const item of order.cartItems) {
-        const targetId = item.productId || item._id; 
+      for (let i = 0; i < order.cartItems.length; i++) {
+        const item = order.cartItems[i];
+        // Pehle humne jo original ID nikaali thi, use use karenge
+        const targetId = originalProductIds[i]; 
 
         if (!targetId) {
           console.log(`⚠️ Product ID missing for item: ${item.name}`);
           continue; 
         }
 
+        // Real Product Model se dhundhein
         const product = await Product.findById(targetId);
         
         if (product) {
           const orderedQty = Number(item.quantity) || 0;
           const currentStock = Number(product.stock) || 0;
 
+          // Stock update
           product.stock = Math.max(currentStock - orderedQty, 0);
           await product.save();
           
@@ -486,7 +546,37 @@ router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+// GET: http://localhost:8000/api/seller/analytics
+router.get('/api/seller/analytics', verifyToken, async (req, res) => {
+  try {
+    const sellerId = req.userId;
 
+    // Seller ke saare products database se nikalein
+    const products = await Product.find({ sellerId: sellerId });
+
+    let totalProducts = products.length;
+    let totalStock = 0;
+    let totalValue = 0;
+
+    products.forEach(product => {
+      const stock = Number(product.stock) || 0;
+      const price = Number(product.price) || 0;
+
+      totalStock += stock;
+      // Real-time Total Value = Current Stock * Product Price
+      totalValue += (stock * price);
+    });
+
+    res.status(200).json({
+      totalProducts,
+      totalStock,
+      totalValue
+    });
+  } catch (err) {
+    console.error("Failed to get product analytics:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 // ==========================================
 // 5. GET USER ORDERS
 // ==========================================
