@@ -707,4 +707,21 @@ router.put('/api/seller/order/:orderId/item/:itemId/status', verifyToken, async 
   }
 });
 
+// 5. GET LOGGED-IN USER'S ORDERS
+router.get('/api/user/orders', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId; // Middleware se aayi hui logged-in user ki ID
+    
+    console.log("Fetching orders for User ID:", userId);
+
+    // Database me us userId ke saare orders dhoondhein
+    const userOrders = await Order.find({ userId: userId }).sort({ createdAt: -1 });
+    
+    res.status(200).json(userOrders);
+  } catch (err) {
+    console.error("Failed to get user orders:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
