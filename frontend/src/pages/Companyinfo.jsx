@@ -109,13 +109,23 @@ const Companyinfo = () => {
                 }}>
                     
                     {/* Box 1 - Soft Light Blue */}
-                    <div style={{ ...boxStyle, backgroundColor: "#f0f9ff", border: "1px solid #e0f2fe" }}>
+                    {/* <div style={{ ...boxStyle, backgroundColor: "#f0f9ff", border: "1px solid #e0f2fe" }}>
                         <div style={{ ...iconCircleStyle, backgroundColor: "#e0f2fe" }}>
                             <img src={shipping} alt="shipping" style={{height: "22px"}} />
                         </div>
                         <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px", color: "#0369a1" }}>Worldwide Shipping</h4>
                         <p style={{ fontSize: "13px", color: "#0369a1", opacity: 0.8, lineHeight: "1.5" }}>Express tracking nodes across the entire globe.</p>
-                    </div>
+                    </div> */}
+
+                    {/* Box 1 - Soft Light Blue */}
+<div style={{ ...boxStyle, backgroundColor: "#f0f9ff", border: "1px solid #e0f2fe" }}>
+    <div style={{ ...iconCircleStyle, backgroundColor: "#e0f2fe" }}>
+        {/* इमेज हटाकर सीधे इमोजी डाल दिया */}
+        <span style={{ fontSize: "22px" }}>🌐</span> 
+    </div>
+    <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px", color: "#0369a1" }}>Worldwide Shipping</h4>
+    <p style={{ fontSize: "13px", color: "#0369a1", opacity: 0.8, lineHeight: "1.5" }}>Express tracking nodes across the entire globe.</p>
+</div>
 
                     {/* Box 2 - Soft Mint Green */}
                     <div style={{ ...boxStyle, backgroundColor: "#f0fdf4", border: "1px solid #dcfce7" }}>
@@ -136,7 +146,7 @@ const Companyinfo = () => {
                     </div>
 
                     {/* Box 4 - Soft Lavender/Purple */}
-                    <div style={{ ...boxStyle, backgroundColor: "#faf5ff", border: "1px solid #f3e8ff" }}>
+                    {/* <div style={{ ...boxStyle, backgroundColor: "#faf5ff", border: "1px solid #f3e8ff" }}>
                         <div style={{ ...iconCircleStyle, backgroundColor: "#f3e8ff" }}>
                             <img src={lock} alt="secure" style={{height: "22px"}} />
                         </div>
@@ -144,7 +154,17 @@ const Companyinfo = () => {
                         <p style={{ fontSize: "13px", color: "#6b21a8", opacity: 0.8, lineHeight: "1.5" }}>End-to-end tokenized online payment execution.</p>
                     </div>
 
-                </div>
+                </div> */}
+
+                {/* Box 4 - Soft Lavender/Purple */}
+<div style={{ ...boxStyle, backgroundColor: "#faf5ff", border: "1px solid #f3e8ff" }}>
+    <div style={{ ...iconCircleStyle, backgroundColor: "#f3e8ff" }}>
+        {/* इमेज हटाकर सीधे इमोजी डाल दिया */}
+        <span style={{ fontSize: "22px" }}>🔒</span>
+    </div>
+    <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px", color: "#6b21a8" }}>Secure Standard</h4>
+    <p style={{ fontSize: "13px", color: "#6b21a8", opacity: 0.8, lineHeight: "1.5" }}>End-to-end tokenized online payment execution.</p>
+</div>
             </section>
 
             {/* 4. Creative Team Section */}
