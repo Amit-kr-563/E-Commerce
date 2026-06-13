@@ -1,21 +1,21 @@
 // src/pages/Companyinfo.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import lock from "../Assets/lock.png";
-import shipping from "../Assets/shipping.png";
+import amitk from "../Assets/amitk.png";
+import modi from "../Assets/modi.jpeg";
 import badge from "../Assets/badge.png";
 import discount from "../Assets/discount.png";
 
 const teamMembers = [
     {
-        name: "Amanda Lee",
+        name: "Amit Kumar",
         role: "Creative Head",
-        img: lock, 
+        img: amitk, 
     },
     {
-        name: "Lee Stoner",
+        name: "Dharmendra Kumar",
         role: "Marketing Head",
-        img: "/team2.jpg",
+        img: modi,
     },
     {
         name: "Monica Gala",
