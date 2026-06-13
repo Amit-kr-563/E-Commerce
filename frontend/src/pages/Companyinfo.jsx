@@ -152,11 +152,9 @@ const Companyinfo = () => {
                         </div>
                         <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px", color: "#6b21a8" }}>Secure Standard</h4>
                         <p style={{ fontSize: "13px", color: "#6b21a8", opacity: 0.8, lineHeight: "1.5" }}>End-to-end tokenized online payment execution.</p>
-                    </div>
+                    </div> */}
 
-                </div> */}
-
-                {/* Box 4 - Soft Lavender/Purple */}
+                    {/* Box 4 - Soft Lavender/Purple */}
 <div style={{ ...boxStyle, backgroundColor: "#faf5ff", border: "1px solid #f3e8ff" }}>
     <div style={{ ...iconCircleStyle, backgroundColor: "#f3e8ff" }}>
         {/* इमेज हटाकर सीधे इमोजी डाल दिया */}
@@ -165,6 +163,8 @@ const Companyinfo = () => {
     <h4 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px", color: "#6b21a8" }}>Secure Standard</h4>
     <p style={{ fontSize: "13px", color: "#6b21a8", opacity: 0.8, lineHeight: "1.5" }}>End-to-end tokenized online payment execution.</p>
 </div>
+
+                </div>
             </section>
 
             {/* 4. Creative Team Section */}
