@@ -1,6 +1,12 @@
+
+
+
+
 // import axios from 'axios';
 // import { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
+// // 1. SweetAlert2 ko import kiya
+// import Swal from 'sweetalert2'; 
 // import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 // import './ProductForm.css';
 
@@ -170,6 +176,7 @@
 //     });
 //   };
 
+//   // FIX: Form submit hone par ab professional SweetAlert popup dikhega
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setError('');
@@ -190,12 +197,30 @@
 //         headers: { Authorization: `Bearer ${token}` }
 //       });
       
-//       alert(response.data.message);
+//       // 2. Alert box ko replace kiya elegant modal aur timer progress bar ke sath
+//       await Swal.fire({
+//         icon: 'success',
+//         title: 'Product Added Successfully!',
+//         text: response.data.message || 'Your new product is live now.',
+//         confirmButtonColor: '#10b981', // Emerald green theme to match creation success
+//         timer: 3000,
+//         timerProgressBar: true
+//       });
+      
 //       navigate('/seller/dashboard');
 //     } catch (err) {
 //       console.error('Error adding product:', err);
 //       console.error('Error response:', err.response?.data);
-//       setError(err.response?.data?.message || err.message || 'Failed to add product');
+//       const errMsg = err.response?.data?.message || err.message || 'Failed to add product';
+//       setError(errMsg);
+
+//       // Error popup box
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Submission Failed',
+//         text: errMsg,
+//         confirmButtonColor: '#ef4444'
+//       });
 //     } finally {
 //       setUploading(false);
 //     }
@@ -505,12 +530,10 @@
 
 // export default AddProduct;
 
-
-
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// 1. SweetAlert2 ko import kiya
+// SweetAlert2 ko import kiya
 import Swal from 'sweetalert2'; 
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 import './ProductForm.css';
@@ -519,7 +542,7 @@ function AddProduct() {
   const [formData, setFormData] = useState({
     name: '',
     img: '',
-    images: [], // Additional images
+    images: [], // Additional images URL links array
     price: '',
     originalprice: '',
     category: 'Fashion & Apparel',
@@ -528,6 +551,21 @@ function AddProduct() {
     stock: '',
     specifications: {}
   });
+
+  // Apne Cloudinary ke credentials yahan likho (Ya fir env se uthao)
+  // Cloudinary dashboard par 'Unsigned Upload Preset' enable hona chahiye Settings -> Upload me
+  const CLOUD_NAME = "dixggoqx3"; // <-- Apna Cloud Name yahan likho
+  const UPLOAD_PRESET = "ecommerceimg"; // <-- Apna Upload Preset yahan likho
+
+  const [imageFile, setImageFile] = useState(null); // Main Image File object
+  const [additionalFiles, setAdditionalFiles] = useState([]); // Additional Files array
+  const [imagePreview, setImagePreview] = useState(null);
+  const [additionalImagesPreviews, setAdditionalImagesPreviews] = useState([]); 
+  const [enableSpecifications, setEnableSpecifications] = useState(false);
+  const [specifications, setSpecifications] = useState([{ key: '', value: '' }]);
+  const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
 
   // Calculate discount percentage
   const calculateDiscount = () => {
@@ -538,18 +576,9 @@ function AddProduct() {
     }
     return 0;
   };
-  const [imagePreview, setImagePreview] = useState(null);
-  const [additionalImages, setAdditionalImages] = useState([]); // Preview for additional images
-  const [enableSpecifications, setEnableSpecifications] = useState(false);
-  const [specifications, setSpecifications] = useState([{ key: '', value: '' }]);
-  const [error, setError] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // If category changes, reset subcategory to first option
     if (name === 'category') {
       const firstSubcategory = getSubcategories(value)[0];
       setFormData({
@@ -565,61 +594,56 @@ function AddProduct() {
     }
   };
 
+  // Helper: Cloudinary Upload Function
+  const uploadToCloudinary = async (file) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", UPLOAD_PRESET);
+    
+    const res = await axios.post(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+      data
+    );
+    return res.data.secure_url; // Yeh hume image ka direct URL link dega
+  };
+
+  // Main image handler
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setError('Please select a valid image file');
         return;
       }
-      
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('Image size should be less than 5MB');
         return;
       }
 
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setFormData({
-          ...formData,
-          img: reader.result
-        });
-      };
-      reader.readAsDataURL(file);
+      setImageFile(file); // File object ko save kiya, Base64 nahi banaya!
+      setImagePreview(URL.createObjectURL(file)); // Local browser preview string
       setError('');
     }
   };
 
   const handleImageUrlChange = (e) => {
     const url = e.target.value;
-    setFormData({
-      ...formData,
-      img: url
-    });
-    if (url) {
-      setImagePreview(url);
-    }
+    setFormData({ ...formData, img: url });
+    if (url) setImagePreview(url);
   };
 
+  // Additional images handler
   const handleAdditionalImagesChange = (e) => {
     const files = Array.from(e.target.files);
     
-    if (files.length > 10) {
+    if (files.length + additionalFiles.length > 10) {
       setError('You can upload maximum 10 additional images');
       return;
     }
     
     const validFiles = files.filter(file => {
-      if (!file.type.startsWith('image/')) {
-        return false;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        return false;
-      }
+      if (!file.type.startsWith('image/')) return false;
+      if (file.size > 5 * 1024 * 1024) return false;
       return true;
     });
 
@@ -627,31 +651,15 @@ function AddProduct() {
       setError('Some files were invalid (not images or too large)');
     }
 
-    const imagePromises = validFiles.map(file => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-      });
-    });
-
-    Promise.all(imagePromises).then(images => {
-      setAdditionalImages(images);
-      setFormData({
-        ...formData,
-        images: images
-      });
-      setError('');
-    });
+    setAdditionalFiles(prev => [...prev, ...validFiles]);
+    const previews = validFiles.map(file => URL.createObjectURL(file));
+    setAdditionalImagesPreviews(prev => [...prev, ...previews]);
+    setError('');
   };
 
   const removeAdditionalImage = (index) => {
-    const newImages = additionalImages.filter((_, i) => i !== index);
-    setAdditionalImages(newImages);
-    setFormData({
-      ...formData,
-      images: newImages
-    });
+    setAdditionalFiles(prev => prev.filter((_, i) => i !== index));
+    setAdditionalImagesPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const addSpecificationField = () => {
@@ -668,7 +676,6 @@ function AddProduct() {
     newSpecs[index][field] = value;
     setSpecifications(newSpecs);
     
-    // Update formData with valid specifications
     const validSpecs = {};
     newSpecs.forEach(spec => {
       if (spec.key.trim() && spec.value.trim()) {
@@ -681,33 +688,52 @@ function AddProduct() {
     });
   };
 
-  // FIX: Form submit hone par ab professional SweetAlert popup dikhega
+  // FORM SUBMIT LOGIC (UPDATED WITH CLOUDINARY UPLOAD PROGRESS)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setUploading(true);
     
     try {
+      let finalMainImageUrl = formData.img;
+      let finalAdditionalUrls = [];
+
+      // 1. Agar user ne file upload ki hai, toh pehle use Cloudinary par bhejo
+      if (imageFile) {
+        finalMainImageUrl = await uploadToCloudinary(imageFile);
+      }
+
+      // 2. Additional images ko ek-ek karke Cloudinary par upload karo
+      if (additionalFiles.length > 0) {
+        const uploadPromises = additionalFiles.map(file => uploadToCloudinary(file));
+        finalAdditionalUrls = await Promise.all(uploadPromises);
+      }
+
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
       
-      // Prepare data with specifications if enabled
-      const dataToSubmit = { ...formData };
+      // Data taiyaar karo backend bhejne ke liye (Sirf URL links honge isme)
+      const dataToSubmit = { 
+        ...formData,
+        img: finalMainImageUrl,
+        images: finalAdditionalUrls
+      };
+
       if (!enableSpecifications) {
         dataToSubmit.specifications = {};
       }
       
-      console.log('Submitting product data:', dataToSubmit);
+      // Backend api hit kiya (Ab ye 1-2 KB ka chota request request ban chuka hai)
+      // Note: Apne live Render URL se badal lena agar local testing nahi kar rahe ho toh!
       const response = await axios.post('http://localhost:8000/api/products', dataToSubmit, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // 2. Alert box ko replace kiya elegant modal aur timer progress bar ke sath
       await Swal.fire({
         icon: 'success',
         title: 'Product Added Successfully!',
         text: response.data.message || 'Your new product is live now.',
-        confirmButtonColor: '#10b981', // Emerald green theme to match creation success
+        confirmButtonColor: '#10b981',
         timer: 3000,
         timerProgressBar: true
       });
@@ -715,11 +741,9 @@ function AddProduct() {
       navigate('/seller/dashboard');
     } catch (err) {
       console.error('Error adding product:', err);
-      console.error('Error response:', err.response?.data);
       const errMsg = err.response?.data?.message || err.message || 'Failed to add product';
       setError(errMsg);
 
-      // Error popup box
       Swal.fire({
         icon: 'error',
         title: 'Submission Failed',
@@ -807,9 +831,9 @@ function AddProduct() {
               </label>
             </div>
 
-            {additionalImages.length > 0 && (
+            {additionalImagesPreviews.length > 0 && (
               <div className="additional-images-preview">
-                {additionalImages.map((img, index) => (
+                {additionalImagesPreviews.map((img, index) => (
                   <div key={index} className="additional-image-item">
                     <img src={img} alt={`Additional ${index + 1}`} />
                     <button
@@ -1018,7 +1042,7 @@ function AddProduct() {
             >
               {uploading ? (
                 <>
-                  <i className="fas fa-spinner fa-spin"></i> Adding...
+                  <i className="fas fa-spinner fa-spin"></i> Uploading to Cloudinary...
                 </>
               ) : (
                 <>

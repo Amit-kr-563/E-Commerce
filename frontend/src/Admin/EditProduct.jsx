@@ -1,6 +1,10 @@
+
+
 // import axios from 'axios';
 // import { useCallback, useEffect, useState } from 'react';
 // import { useNavigate, useParams } from 'react-router-dom';
+// // 1. SweetAlert2 ko import kiya
+// import Swal from 'sweetalert2'; 
 // import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 // import './ProductForm.css';
 
@@ -54,12 +58,12 @@
 //         stock: response.data.stock
 //       });
 //       setImagePreview(response.data.img);
-//       setLoading(false);
+//       loading && setLoading(false);
 //     } catch (err) {
 //       setError('Failed to load product');
 //       setLoading(false);
 //     }
-//   }, [id]);
+//   }, [id, loading]);
 
 //   useEffect(() => {
 //     fetchProduct();
@@ -121,6 +125,7 @@
 //     }
 //   };
 
+//   // FIX: Form submit hone par ab professional modal popup dikhega
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setError('');
@@ -133,16 +138,32 @@
 //         headers: { Authorization: `Bearer ${token}` }
 //       });
       
-//       alert(response.data.message);
+//       // 2. Boring alert ki jagah SweetAlert2 ka clean popup box
+//       await Swal.fire({
+//         icon: 'success',
+//         title: 'Product Updated!',
+//         text: response.data.message || 'Your product has been updated successfully.',
+//         confirmButtonColor: '#4f46e5', // Dashboard primary theme se match karta hua blue/indigo color
+//         timer: 3000,
+//         timerProgressBar: true
+//       });
+      
 //       navigate('/seller/dashboard');
 //     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to update product');
+//       const errMsg = err.response?.data?.message || 'Failed to update product';
+//       setError(errMsg);
+
+//       // Error ke liye SweetAlert2 Alert Box
+//       Swal.fire({
+//         icon: 'error',
+//         title: 'Error updating product',
+//         text: errMsg,
+//         confirmButtonColor: '#e71d36'
+//       });
 //     } finally {
 //       setUploading(false);
 //     }
 //   };
-
-
 
 //   if (loading) {
 //     return (
@@ -163,7 +184,6 @@
 //       </div>
 //     );
 //   }
-
 
 //   return (
 //     <div className="product-form-container">
@@ -380,10 +400,14 @@
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// 1. SweetAlert2 ko import kiya
+// SweetAlert2 ko import kiya
 import Swal from 'sweetalert2'; 
 import { getAllCategories, getCategoryIcon, getSubcategories } from '../data/categories';
 import './ProductForm.css';
+
+// Cloudinary Configuration
+const CLOUD_NAME = "dixggoqx3"; 
+const UPLOAD_PRESET = "ecommerceimg"; 
 
 function EditProduct() {
   const [formData, setFormData] = useState({
@@ -398,6 +422,7 @@ function EditProduct() {
     stock: '',
     specifications: {}
   });
+  const [selectedFile, setSelectedFile] = useState(null); // Nayi file track karne ke liye
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -449,7 +474,6 @@ function EditProduct() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // If category changes, reset subcategory to first option
     if (name === 'category') {
       const firstSubcategory = getSubcategories(value)[0];
       setFormData({
@@ -465,6 +489,7 @@ function EditProduct() {
     }
   };
 
+  // CHANGE 1: Ab Base64 nahi banega, direct file ko state me save karenge aur instant preview dikhayenge
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -478,21 +503,15 @@ function EditProduct() {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setFormData({
-          ...formData,
-          img: reader.result
-        });
-      };
-      reader.readAsDataURL(file);
+      setSelectedFile(file); // File ko baad me upload karne ke liye save kiya
+      setImagePreview(URL.createObjectURL(file)); // Browser-generated temporary URL preview ke liye
       setError('');
     }
   };
 
   const handleImageUrlChange = (e) => {
     const url = e.target.value;
+    setSelectedFile(null); // Agar URL daal diya toh selected file reset kar do
     setFormData({
       ...formData,
       img: url
@@ -502,25 +521,48 @@ function EditProduct() {
     }
   };
 
-  // FIX: Form submit hone par ab professional modal popup dikhega
+  // CHANGE 2: Form submit hone par pehle Cloudinary upload hoga (agar new file select hui hai toh)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setUploading(true);
     
     try {
+      let finalImageUrl = formData.img;
+
+      // Agar user ne koi nayi local file choose ki hai tabhi Cloudinary par upload chalega
+      if (selectedFile) {
+        const data = new FormData();
+        data.append("file", selectedFile);
+        data.append("upload_preset", UPLOAD_PRESET);
+        data.append("cloud_name", CLOUD_NAME);
+
+        const cloudinaryResponse = await axios.post(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          data
+        );
+        
+        finalImageUrl = cloudinaryResponse.data.secure_url; // Naya Cloudinary URL mil gaya
+      }
+
+      // Backend ko data bhej rahe hain updated URL ke sath
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       const token = loggedInUser?.token;
-      const response = await axios.put(`http://localhost:8000/api/products/${id}`, formData, {
+      
+      const updatedFormData = {
+        ...formData,
+        img: finalImageUrl // Cloudinary URL set kar diya
+      };
+
+      const response = await axios.put(`http://localhost:8000/api/products/${id}`, updatedFormData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // 2. Boring alert ki jagah SweetAlert2 ka clean popup box
       await Swal.fire({
         icon: 'success',
         title: 'Product Updated!',
         text: response.data.message || 'Your product has been updated successfully.',
-        confirmButtonColor: '#4f46e5', // Dashboard primary theme se match karta hua blue/indigo color
+        confirmButtonColor: '#4f46e5',
         timer: 3000,
         timerProgressBar: true
       });
@@ -530,7 +572,6 @@ function EditProduct() {
       const errMsg = err.response?.data?.message || 'Failed to update product';
       setError(errMsg);
 
-      // Error ke liye SweetAlert2 Alert Box
       Swal.fire({
         icon: 'error',
         title: 'Error updating product',
@@ -553,7 +594,6 @@ function EditProduct() {
             </div>
           </div>
           <h3>Fetching Data</h3>
-          
           <div className="infinite-bar-track">
             <div className="infinite-bar-fill"></div>
           </div>
@@ -758,7 +798,7 @@ function EditProduct() {
               {uploading ? (
                 <>
                   <i className="fas fa-spinner fa-spin"></i> Updating...
-                </>
+                </                >
               ) : (
                 <>
                   <i className="fas fa-save"></i> Update Product
