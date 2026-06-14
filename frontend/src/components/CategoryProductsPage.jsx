@@ -169,11 +169,11 @@ export default function CategoryProductsPage({ category, title }) {
   }, [category]);
 
   return (
-    /* Global Wrapper: Jo screen ko left-right hilne se 100% rokega */
+    
     <div style={{ width: '100%', minHeight: '100vh', overflowX: 'hidden', backgroundColor: '#f8fafc', boxSizing: 'border-box' }}>
       <Navbar />
       
-      /* Container: Jo desktop par margin manage karega aur mobile par automatic adjust hoga */
+     
       <div style={{ 
         width: '100%', 
         maxWidth: '1240px', 
