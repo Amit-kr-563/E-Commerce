@@ -95,9 +95,43 @@ router.get('/api/seller/products', verifyToken, async (req, res) => {
 });
 
 // Add new product (Seller only)
+// router.post('/api/products', verifyToken, async (req, res) => {
+//   try {
+//     const { name, img, price, originalprice, category, subcategory, description, stock } = req.body;
+    
+//     // Auto-calculate discount percentage
+//     let discount = '0%';
+//     if (originalprice && price && originalprice > price) {
+//       const discountPercent = Math.round(((originalprice - price) / originalprice) * 100);
+//       discount = `${discountPercent}%`;
+//     }
+    
+//     const product = new Product({
+//       name,
+//       img,
+//       price,
+//       originalprice,
+//       discount,
+//       category,
+//       subcategory,
+//       description,
+//       stock,
+//       seller: req.userId
+//     });
+    
+//     await product.save();
+//     res.status(201).json({ message: "Product added successfully", product });
+//   } catch (error) {
+//     console.log("Add Product Error:", error);
+//     console.log("Request Body:", req.body);
+//     res.status(500).json({ message: error.message || "Something went wrong", error: error.toString() });
+//   }
+// });
+// Add new product (Seller only)
 router.post('/api/products', verifyToken, async (req, res) => {
   try {
-    const { name, img, price, originalprice, category, subcategory, description, stock } = req.body;
+    // 🔴 FIXED: Inme 'images' aur 'specifications' ko add kiya gaya hai
+    const { name, img, images, price, originalprice, category, subcategory, description, stock, specifications } = req.body;
     
     // Auto-calculate discount percentage
     let discount = '0%';
@@ -109,6 +143,7 @@ router.post('/api/products', verifyToken, async (req, res) => {
     const product = new Product({
       name,
       img,
+      images: images || [], // 🔴 Database me save karne ke liye pass kiya
       price,
       originalprice,
       discount,
@@ -116,6 +151,7 @@ router.post('/api/products', verifyToken, async (req, res) => {
       subcategory,
       description,
       stock,
+      specifications: specifications || {}, // 🔴 Database me save karne ke liye pass kiya
       seller: req.userId
     });
     
@@ -129,6 +165,41 @@ router.post('/api/products', verifyToken, async (req, res) => {
 });
 
 // Update product (Seller only)
+// router.put('/api/products/:id', verifyToken, async (req, res) => {
+//   try {
+//     const product = await Product.findOne({ _id: req.params.id, seller: req.userId });
+    
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found or unauthorized" });
+//     }
+    
+//     const { name, img, price, originalprice, category, subcategory, description, stock } = req.body;
+    
+//     product.name = name || product.name;
+//     product.img = img || product.img;
+//     product.price = price !== undefined ? price : product.price;
+//     product.originalprice = originalprice !== undefined ? originalprice : product.originalprice;
+//     product.category = category || product.category;
+//     product.subcategory = subcategory || product.subcategory;
+//     product.description = description || product.description;
+//     product.stock = stock !== undefined ? stock : product.stock;
+    
+//     // Auto-calculate discount percentage
+//     if (product.originalprice && product.price && product.originalprice > product.price) {
+//       const discountPercent = Math.round(((product.originalprice - product.price) / product.originalprice) * 100);
+//       product.discount = `${discountPercent}%`;
+//     } else {
+//       product.discount = '0%';
+//     }
+    
+//     await product.save();
+//     res.status(200).json({ message: "Product updated successfully", product });
+//   } catch (error) {
+//     console.log("Update Product Error:", error);
+//     res.status(500).json({ message: "Something went wrong" });
+//   }
+// });
+// Update product (Seller only)
 router.put('/api/products/:id', verifyToken, async (req, res) => {
   try {
     const product = await Product.findOne({ _id: req.params.id, seller: req.userId });
@@ -137,16 +208,19 @@ router.put('/api/products/:id', verifyToken, async (req, res) => {
       return res.status(404).json({ message: "Product not found or unauthorized" });
     }
     
-    const { name, img, price, originalprice, category, subcategory, description, stock } = req.body;
+    // 🔴 FIXED: Inme bhi 'images' aur 'specifications' ko destructure kiya
+    const { name, img, images, price, originalprice, category, subcategory, description, stock, specifications } = req.body;
     
     product.name = name || product.name;
     product.img = img || product.img;
+    product.images = images !== undefined ? images : product.images; // 🔴 Update logic added
     product.price = price !== undefined ? price : product.price;
     product.originalprice = originalprice !== undefined ? originalprice : product.originalprice;
     product.category = category || product.category;
     product.subcategory = subcategory || product.subcategory;
     product.description = description || product.description;
     product.stock = stock !== undefined ? stock : product.stock;
+    product.specifications = specifications !== undefined ? specifications : product.specifications; // 🔴 Update logic added
     
     // Auto-calculate discount percentage
     if (product.originalprice && product.price && product.originalprice > product.price) {
