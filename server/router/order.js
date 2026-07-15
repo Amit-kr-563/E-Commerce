@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 const express = require('express');
 const router = express.Router();
 const Order = require('../schema/order-schema');
@@ -23,9 +16,9 @@ router.post('/order', async (req, res) => {
       sellerId: item.sellerId || item.seller, 
       name: item.name,
       price: item.price,
-      quantity: Number(item.quantity) || 1, // क्वांटिटी को नंबर में कन्वर्ट किया
+      quantity: Number(item.quantity) || 1, 
       img: item.img,
-      status: 'Ordered' // शुरुआती स्टेटस
+      status: 'Ordered' 
     }));
 
     const orderData = {
@@ -44,7 +37,6 @@ router.post('/order', async (req, res) => {
   }
 });
 
-// 2. GET ALL ORDERS (For Admin)
 router.get('/order/all', async (req, res) => {
   try {
     const orders = await Order.find({});
@@ -55,17 +47,14 @@ router.get('/order/all', async (req, res) => {
   }
 });
 
-// 3. GET SELLER'S ORDERS
 router.get('/api/seller/orders', verifyToken, async (req, res) => {
   try {
     const sellerId = req.userId;
     
-    // उन सभी ऑर्डर्स को ढूंढें जिनमें इस सेलर का कोई प्रोडक्ट है
     const orders = await Order.find({
       'cartItems.sellerId': sellerId
     }).sort({ createdAt: -1 });
     
-    // सिर्फ इसी पर्टिकुलर सेलर के आइटम्स को फ़िल्टर करके फ़्रंटएंड को भेजें
     const sellerOrders = orders.map(order => {
       const sellerItems = order.cartItems.filter(
         item => item.sellerId && item.sellerId.toString() === sellerId.toString()
@@ -79,9 +68,8 @@ router.get('/api/seller/orders', verifyToken, async (req, res) => {
         address: order.address,
         paymentMethod: order.paymentMethod,
         cartItems: sellerItems,
-        // सिर्फ इस सेलर के सामानों का टोटल अमाउंट कैलकुलेट करें
         orderTotal: sellerItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-        status: order.status, // मेन ऑर्डर स्टेटस
+        status: order.status, 
         createdAt: order.createdAt,
         updatedAt: order.updatedAt
       };
@@ -95,7 +83,6 @@ router.get('/api/seller/orders', verifyToken, async (req, res) => {
   }
 });
 
-// 4. GET SELLER ORDER ANALYTICS (Real-Time Counters)
 router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
   try {
     const sellerId = req.userId;
@@ -113,7 +100,6 @@ router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
         if (item.sellerId && item.sellerId.toString() === sellerId.toString()) {
           hasSellerItem = true;
           
-          // रेवेन्यू केवल डिलीवर या एक्टिव ऑर्डर्स का जोड़ें (कैंसिल का नहीं)
           if (item.status !== 'Cancelled') {
             totalRevenue += item.price * item.quantity;
           }
@@ -144,14 +130,13 @@ router.get('/api/seller/order-analytics', verifyToken, async (req, res) => {
 router.put('/api/seller/order/:orderId/item/:itemId/status', verifyToken, async (req, res) => {
   try {
     const { orderId, itemId } = req.params;
-    const { status } = req.body; // 'Dispatched' या 'Delivered'
+    const { status } = req.body; 
     const sellerId = req.userId;
 
     if (!['Ordered', 'Dispatched', 'Delivered', 'Cancelled'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status value' });
     }
 
-    // पहले मौजूदा ऑर्डर और आइटम की स्थिति निकालें (ताकि पता चले कि पहले से डिलीवर तो नहीं था)
     const orderBeforeUpdate = await Order.findOne({
       _id: orderId,
       'cartItems._id': itemId,
@@ -162,22 +147,18 @@ router.put('/api/seller/order/:orderId/item/:itemId/status', verifyToken, async 
       return res.status(404).json({ message: 'Order or Item not found' });
     }
 
-    // उस पर्टिकुलर आइटम को निकालें जिसका स्टेटस बदला जा रहा है
     const targetItem = orderBeforeUpdate.cartItems.id(itemId);
     const previousStatus = targetItem.status;
-    const targetQuantity = Number(targetItem.quantity) || 1; // सटीक क्वांटिटी
+    const targetQuantity = Number(targetItem.quantity) || 1; 
 
-    // डेटाबेस में स्टेटस अपडेट करें
     const updatedOrder = await Order.findOneAndUpdate(
       { _id: orderId, 'cartItems._id': itemId, 'cartItems.sellerId': sellerId },
       { $set: { 'cartItems.$.status': status } },
       { new: true }
     );
 
-    // 🔥 कंडीशन: स्टॉक केवल तब घटेगा जब स्टेटस 'Delivered' होगा और पहले से Delivered नहीं था
     if (status === 'Delivered' && previousStatus !== 'Delivered') {
       if (targetItem.productId) {
-        // $inc में -targetQuantity पास करने से पूरी की पूरी क्वांटिटी एक साथ घट जाएगी
         await Product.findByIdAndUpdate(targetItem.productId, {
           $inc: { stock: -targetQuantity }
         });
@@ -185,7 +166,6 @@ router.put('/api/seller/order/:orderId/item/:itemId/status', verifyToken, async 
       }
     }
 
-    // 🔄 रिवर्स कंडीशन: अगर डिलीवर होने के बाद ऑर्डर कभी Cancelled या री-अपडेट होता है, तो स्टॉक वापस बढ़ जाए
     if (status !== 'Delivered' && previousStatus === 'Delivered') {
       if (targetItem.productId) {
         await Product.findByIdAndUpdate(targetItem.productId, {
@@ -195,7 +175,6 @@ router.put('/api/seller/order/:orderId/item/:itemId/status', verifyToken, async 
       }
     }
 
-    // मुख्य ऑर्डर के स्टेटस को सिंक करना (अगर सब Delivered हो गए तो Completed)
     const allItemsDelivered = updatedOrder.cartItems.every(item => item.status === 'Delivered');
     if (allItemsDelivered) {
       updatedOrder.status = 'Completed';
@@ -211,14 +190,12 @@ router.put('/api/seller/order/:orderId/item/:itemId/status', verifyToken, async 
   }
 });
 
-// 5. GET LOGGED-IN USER'S ORDERS
 router.get('/api/user/orders', verifyToken, async (req, res) => {
   try {
-    const userId = req.userId; // Middleware se aayi hui logged-in user ki ID
+    const userId = req.userId; 
     
     console.log("Fetching orders for User ID:", userId);
 
-    // Database me us userId ke saare orders dhoondhein
     const userOrders = await Order.find({ userId: userId }).sort({ createdAt: -1 });
     
     res.status(200).json(userOrders);

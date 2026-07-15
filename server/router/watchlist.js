@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Watchlist = require("../schema/Watchlist");
 
-// Add to watchlist
 router.post("/watchlist", async (req, res) => {
   console.log("=== ADD TO WATCHLIST DEBUG ===");
   console.log("Request body:", JSON.stringify(req.body, null, 2));
@@ -20,7 +19,6 @@ router.post("/watchlist", async (req, res) => {
   }
 
   try {
-    // Check if already in watchlist
     const existingItem = await Watchlist.findOne({
       username,
       name: product.name
@@ -48,7 +46,6 @@ router.post("/watchlist", async (req, res) => {
   }
 });
 
-// Get watchlist by username
 router.get("/watchlist/:username", async (req, res) => {
   try {
     const items = await Watchlist.find({ username: req.params.username });

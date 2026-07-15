@@ -4,11 +4,10 @@ const Review = require('../schema/review-schema');
 const Order = require('../schema/order-schema');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Add a review (Protected route)
 router.post('/api/reviews', authMiddleware, async (req, res) => {
   try {
     const { productId, orderId, rating, review } = req.body;
-    const userId = req.userId; // Changed from req.user.userId
+    const userId = req.userId;
     
     console.log("=== REVIEW SUBMISSION DEBUG ===");
     console.log("Request Body:", req.body);
@@ -23,7 +22,6 @@ router.post('/api/reviews', authMiddleware, async (req, res) => {
     console.log("- rating:", !!rating);
     console.log("- review:", !!review);
 
-    // Validate input
     if (!productId || !orderId || !rating || !review) {
       console.log("Validation failed - missing fields");
       return res.status(400).json({ 
@@ -36,7 +34,6 @@ router.post('/api/reviews', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'Rating must be between 1 and 5' });
     }
 
-    // Get user details
     const User = require('../schema/user-schema');
     const user = await User.findById(userId);
     if (!user) {
@@ -46,13 +43,11 @@ router.post('/api/reviews', authMiddleware, async (req, res) => {
     const userName = user.name || user.email?.split('@')[0] || 'Anonymous';
     console.log("User Name:", userName);
 
-    // Check if order exists and belongs to the user
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Check if order belongs to user (match by email, mobile, or username)
     const orderBelongsToUser = 
       order.username === user.email || 
       order.username === user.mobile || 
@@ -63,24 +58,20 @@ router.post('/api/reviews', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized to review this order' });
     }
 
-    // Check if product is in the order and is delivered
     const productInOrder = order.cartItems.find(item => item.productId.toString() === productId);
     if (!productInOrder) {
       return res.status(400).json({ message: 'Product not found in this order' });
     }
 
-    // Check if the specific item is delivered
     if (productInOrder.status !== 'Delivered') {
       return res.status(400).json({ message: 'You can only review delivered products' });
     }
 
-    // Check if review already exists
     const existingReview = await Review.findOne({ userId, productId, orderId });
     if (existingReview) {
       return res.status(400).json({ message: 'You have already reviewed this product' });
     }
 
-    // Create review
     const newReview = new Review({
       userId,
       productId,
@@ -103,7 +94,6 @@ router.post('/api/reviews', authMiddleware, async (req, res) => {
   }
 });
 
-// Get reviews for a product
 router.get('/api/reviews/product/:productId', async (req, res) => {
   try {
     const { productId } = req.params;
@@ -112,13 +102,11 @@ router.get('/api/reviews/product/:productId', async (req, res) => {
       .sort({ createdAt: -1 })
       .select('userName rating review createdAt');
 
-    // Calculate average rating
     const totalReviews = reviews.length;
     const averageRating = totalReviews > 0 
       ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
       : 0;
 
-    // Calculate rating distribution
     const ratingDistribution = {
       5: reviews.filter(r => r.rating === 5).length,
       4: reviews.filter(r => r.rating === 4).length,
@@ -140,7 +128,6 @@ router.get('/api/reviews/product/:productId', async (req, res) => {
   }
 });
 
-// Check if user has reviewed a product in a specific order
 router.get('/api/reviews/check', authMiddleware, async (req, res) => {
   try {
     const { productId, orderId } = req.query;
@@ -159,11 +146,9 @@ router.get('/api/reviews/check', authMiddleware, async (req, res) => {
   }
 });
 
-// Get review eligibility for logged-in user
 router.get('/api/user/review-eligibility', authMiddleware, async (req, res) => {
   try {
     const userId = req.userId;
-    // Find orders for this user by userId or email/username
     const User = require('../schema/user-schema');
     const user = await User.findById(userId).select('email mobile');
 
@@ -184,11 +169,9 @@ router.get('/api/user/review-eligibility', authMiddleware, async (req, res) => {
 
     for (const order of orders) {
       for (const item of order.cartItems) {
-        // Normalize productId
         const productId = item.productId && item.productId._id ? item.productId._id : item.productId;
         if (!productId) continue;
 
-        // Consider item delivered if either item.status or order.status marks it delivered
         const isDelivered = (item.status === 'Delivered') || (order.status === 'Delivered');
         if (isDelivered) {
           const existing = await Review.findOne({ userId, productId, orderId: order._id });

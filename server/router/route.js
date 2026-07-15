@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../schema/user-schema');
 const verifyToken = require('../middleware/authMiddleware');
 
-// Document Validation Functions
 const validateAadhar = (aadhar) => {
   if (!aadhar) return false;
   const cleaned = aadhar.replace(/\s/g, '');
@@ -14,13 +13,11 @@ const validateAadhar = (aadhar) => {
 
 const validatePAN = (pan) => {
   if (!pan) return false;
-  // PAN Format: ABCDE1234F (5 letters, 4 numbers, 1 letter)
   return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(pan.trim());
 };
 
 const validateGST = (gst) => {
-  if (!gst) return true; // GST is optional
-  // GST Format: 15 characters
+  if (!gst) return true; 
   return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9]{1}[Z]{1}[0-9A-Z]{1}$/i.test(gst.trim());
 };
 
@@ -32,11 +29,9 @@ const getClientIp = (req) => {
   return req.socket?.remoteAddress || '';
 };
 
-// Register User
 router.post('/register', async (req, res) => {
   const {
     name, mobile, email, addressLine, city, state, pincode, dob, gender, password, role,
-    // Seller-specific fields
     shopName, businessCategory, businessDescription, panCard, aadhaar, gstNumber,
     pickupSameAsBusiness, pickupAddressLine, pickupCity, pickupState, pickupPincode, pickupContactNumber,
     returnAddressLine, returnCity, returnState, returnPincode,
@@ -45,7 +40,6 @@ router.post('/register', async (req, res) => {
   } = req.body;
   
   try {
-    // Server-side validations
     const mobileRegex = /^\d{10}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
@@ -62,7 +56,6 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Password must be at least 8 characters and include an uppercase letter, a number, and a special character.' });
     }
 
-    // Seller-specific document validations
     if (role === 'seller') {
         if (!aadhaar || !validateAadhar(aadhaar)) {
         return res.status(400).json({ message: 'Invalid Aadhar number. Must be 12 digits.' });
@@ -77,7 +70,6 @@ router.post('/register', async (req, res) => {
       }
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email }, { mobile }]
     });
@@ -86,10 +78,8 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: "User already exists with this email or mobile" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create user object with all fields
     const userData = { 
       name,
       mobile,
@@ -104,7 +94,6 @@ router.post('/register', async (req, res) => {
       role: role || 'user'
     };
 
-    // Add seller-specific fields if role is seller
     if (role === 'seller') {
       if (shopName) userData.shopName = shopName;
       if (businessCategory) userData.businessCategory = businessCategory;
@@ -141,11 +130,9 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Register Seller
 router.post('/seller/register', async (req, res) => {
   const {name,mobile,email,addressLine,city,state,pincode,password} = req.body;
   try {
-    // Server-side validations for seller
     const mobileRegex = /^\d{10}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
@@ -161,7 +148,6 @@ router.post('/seller/register', async (req, res) => {
     if (!password || !passwordRegex.test(password)) {
       return res.status(400).json({ message: 'Password must be at least 8 characters and include an uppercase letter, a number, and a special character.' });
     }
-    // Check if seller already exists
     const existingUser = await User.findOne({
       $or: [{ email }, { mobile }]
     });
@@ -170,7 +156,6 @@ router.post('/seller/register', async (req, res) => {
       return res.status(400).json({ message: "Seller already exists with this email or mobile" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
     
     const seller = new User({ 
@@ -203,7 +188,6 @@ router.post('/login', async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
     
-    // Compare hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return res.status(401).json({ message: "Wrong password" });
 
@@ -212,14 +196,12 @@ router.post('/login', async (req, res) => {
     user.loginCount = (user.loginCount || 0) + 1;
     await user.save();
 
-    // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    // Remove password before sending to frontend
     const { password: pwd, ...safeUser } = user._doc;
 
     const message = user.role === 'seller' ? 'Seller login successful' : 'Login successful';
@@ -235,7 +217,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Seller Login
 router.post('/seller/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -246,7 +227,6 @@ router.post('/seller/login', async (req, res) => {
 
     if (!seller) return res.status(404).json({ message: "Seller not found" });
     
-    // Compare hashed password
     const isPasswordValid = await bcrypt.compare(password, seller.password);
     if (!isPasswordValid) return res.status(401).json({ message: "Wrong password" });
 
@@ -255,14 +235,12 @@ router.post('/seller/login', async (req, res) => {
     seller.loginCount = (seller.loginCount || 0) + 1;
     await seller.save();
 
-    // Generate JWT token
     const token = jwt.sign(
       { userId: seller._id, email: seller.email, role: seller.role },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    // Remove password before sending to frontend
     const { password: pwd, ...safeSeller } = seller._doc;
 
     res.status(200).json({ 
@@ -277,34 +255,13 @@ router.post('/seller/login', async (req, res) => {
 });
 
 
-// User Info for About Page
-// router.post('/userinfo', async (req, res) => {
-//   const { username } = req.body;
-//   try {
-//     const user = await User.findOne({
-//       $or: [{ email: username }, { mobile: username }]
-//     });
 
-//     if (!user) return res.status(404).json("User not found");
-
-//     res.status(200).json({
-//       name: user.name,
-//       email: user.email,
-//       mobile: user.mobile
-//     });
-//   } catch (error) {
-//     console.log("UserInfo Error:", error);
-//     res.status(500).json("Something went wrong");
-//   }
-// });
-// Get user info - Protected route with JWT
 router.get('/userinfo', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Return all user data (password already excluded)
     const userData = {
       _id: user._id,
       name: user.name,
@@ -319,7 +276,6 @@ router.get('/userinfo', verifyToken, async (req, res) => {
       pincode: user.pincode
     };
 
-    // Add seller-specific fields if user is a seller
     if (user.role === 'seller') {
       userData.shopName = user.shopName;
       userData.businessCategory = user.businessCategory;
@@ -351,7 +307,6 @@ router.get('/userinfo', verifyToken, async (req, res) => {
   }
 });
 
-// Admin - Get all user/seller login details
 router.get('/admin/accounts', async (req, res) => {
   try {
     const users = await User.find({}, '-password').sort({ createdAt: -1 });
@@ -381,7 +336,6 @@ router.get('/admin/accounts', async (req, res) => {
   }
 });
 
-// Admin - Remove user/seller account
 router.delete('/admin/accounts/:id', async (req, res) => {
   try {
     const account = await User.findById(req.params.id);
